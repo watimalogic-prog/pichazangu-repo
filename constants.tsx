@@ -1,4 +1,3 @@
-
 import { Photo, Gig, Article, Currency, Vault, Client, Transaction, Model, CastingCall, Bounty, NewsClip, Match, PlayerStats, Bid, AcademyCourse, Grade, PhotographerMarketStats } from './types';
 import { getBlurPlaceholder } from './services/imageService';
 
@@ -239,7 +238,23 @@ export const MOCK_NEWS_BOUNTIES: Bounty[] = [
 ];
 
 export const MOCK_VAULTS: Vault[] = [
-  { id: 'v1', clientId: 'c1', photographerName: 'Ali Studio', passkey: '882910', photoCount: 45, lastUpdated: '2024-05-20', isPublic: false, archiveStatus: 'Permanent' }
+  // DO add comment above each fix.
+  // Fixed missing required properties in MOCK_VAULTS (clientName, clientEmail, clientPhone, clientAvatar, photographerId).
+  { 
+    id: 'v1', 
+    clientId: 'c1', 
+    clientName: 'Zainab Juma',
+    clientEmail: 'zainab@example.com',
+    clientPhone: '+254712345678',
+    clientAvatar: 'https://i.pravatar.cc/150?u=zainab',
+    photographerId: 'ph1',
+    photographerName: 'Ali Studio', 
+    passkey: '882910', 
+    photoCount: 45, 
+    lastUpdated: '2024-05-20', 
+    isPublic: false, 
+    archiveStatus: 'Permanent' 
+  }
 ];
 
 // DO add comment above each fix.

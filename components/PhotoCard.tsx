@@ -1,10 +1,11 @@
 import React from 'react';
-import { MapPin, ShoppingCart, Info, Lock } from 'lucide-react';
+import { MapPin, ShoppingCart, Info, Lock, Zap, Flame, Plus } from 'lucide-react';
 import { Photo, Currency } from '../types';
 import { CURRENCY_SYMBOLS, COLORS } from '../constants';
 import ProtectedImage from './ProtectedImage';
 import VerificationBadge from './VerificationBadge';
 import { useCartStore } from '../store/useAppStore';
+import { motion } from 'framer-motion';
 
 interface PhotoCardProps {
   photo: Photo;
@@ -20,64 +21,83 @@ const PhotoCard: React.FC<PhotoCardProps> = ({ photo, showGeo, currency = 'KES',
   // Logic: Photographer Price + 7/10 fee
   const platformFee = photo.category === 'Stock' ? 10 : 7;
   const totalPrice = photo.price + platformFee;
+  const isIppo = photo.isIPPO;
 
   return (
-    <div className="group relative bg-[#111] rounded-[2rem] overflow-hidden border border-white/5 hover:border-red-600/30 shadow-xl transition-all duration-300">
-      <div className="aspect-[3/4] overflow-hidden bg-gray-900 relative">
+    <motion.div 
+      whileHover={{ y: -8 }}
+      className="group relative bg-white rounded-[2.5rem] overflow-hidden border border-gray-100 hover:border-red-600/30 shadow-sm hover:shadow-2xl transition-all duration-300 flex flex-col h-full"
+    >
+      <div className="aspect-[4/5] overflow-hidden bg-gray-50 relative">
         <ProtectedImage 
           src={photo.url} 
           photographerName={photo.photographer} 
           alt={photo.title}
         />
 
-        <div className="absolute top-4 left-4 flex gap-2 z-20">
-          <span className="bg-black/60 backdrop-blur-md text-white text-[8px] px-3 py-1.5 rounded-full uppercase tracking-widest font-black">
+        <div className="absolute top-6 left-6 flex flex-col gap-2 z-20">
+          <div className="bg-black/60 backdrop-blur-md text-white text-[8px] px-3 py-1.5 rounded-full uppercase tracking-widest font-black border border-white/10">
             {photo.license}
-          </span>
-          {showGeo && photo.location && (
-            <span className="bg-red-600/80 backdrop-blur-md text-white text-[8px] px-3 py-1.5 rounded-full flex items-center gap-1 font-black">
-              <MapPin size={10} /> {photo.location}
-            </span>
+          </div>
+          {isIppo && (
+            <div className="bg-red-600 text-white text-[8px] px-3 py-1.5 rounded-full flex items-center gap-1.5 font-black shadow-xl animate-pulse">
+               <Zap size={10} fill="currentColor" /> IPPO LISTING
+            </div>
           )}
         </div>
 
-        <div className="absolute bottom-4 right-4 p-2 bg-black/60 backdrop-blur-md rounded-xl text-red-500 z-20">
-          <Lock size={16} />
+        {/* QUICK ADD BUTTON - ANIMATED ON HOVER */}
+        <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 z-30 pointer-events-none">
+           <button 
+             onClick={(e) => { e.stopPropagation(); addItem(photo); }}
+             className="pointer-events-auto bg-red-600 text-white w-16 h-16 rounded-3xl shadow-[0_0_40px_rgba(227,30,36,0.6)] flex items-center justify-center transform scale-50 group-hover:scale-100 transition-transform duration-500 ease-out hover:bg-black group-hover:rotate-12"
+           >
+              <Plus size={32} strokeWidth={3} />
+           </button>
+        </div>
+
+        {showGeo && photo.location && (
+          <div className="absolute top-6 right-6 z-20">
+             <div className="bg-white/90 backdrop-blur-md text-gray-900 text-[8px] px-3 py-1.5 rounded-full flex items-center gap-1 font-black border border-gray-100 shadow-sm">
+               <MapPin size={10} className="text-red-600" /> {photo.location}
+             </div>
+          </div>
+        )}
+
+        <div className="absolute inset-x-0 bottom-0 p-8 bg-gradient-to-t from-black/60 via-transparent to-transparent translate-y-full group-hover:translate-y-0 transition-transform duration-500 z-30">
+           <button 
+             onClick={() => addItem(photo)}
+             className="w-full bg-red-600 hover:bg-white hover:text-red-600 text-white text-[10px] font-black uppercase py-4 rounded-2xl transition-all flex items-center justify-center gap-3 shadow-2xl shadow-red-900/40"
+           >
+             <ShoppingCart size={18} /> Full License Details
+           </button>
         </div>
       </div>
       
-      <div className="p-6">
-        <div className="flex justify-between items-start mb-2">
-          <h3 className="font-embroidery text-xl text-white line-clamp-1">{photo.title}</h3>
-          <div className="text-right">
-            <span className="text-red-500 font-bungee text-lg block">
-              {symbol} {totalPrice.toLocaleString()}
+      <div className="p-8 flex-1 flex flex-col">
+        <div className="flex justify-between items-start mb-6">
+          <div className="flex-1 min-w-0">
+             <h3 className="font-bold text-gray-900 text-xl line-clamp-1 group-hover:text-red-600 transition-colors leading-tight">{photo.title}</h3>
+             <p className="text-gray-400 text-[9px] mt-1.5 flex items-center gap-2 font-black uppercase tracking-widest">
+               By <span className="text-gray-900">{photo.photographer}</span> <VerificationBadge type="photographer" size={12} />
+             </p>
+          </div>
+          <div className="text-right ml-4 shrink-0">
+            <span className="text-red-600 font-bungee text-2xl block leading-none">
+              {totalPrice.toLocaleString()}
             </span>
-            {isPhotographerMode && (
-              <span className="text-[8px] text-gray-500 font-bold uppercase">
-                INC. {platformFee} KSH FEE (HIDDEN)
-              </span>
-            )}
+            <span className="text-[8px] text-gray-400 font-black uppercase">{symbol}</span>
           </div>
         </div>
         
-        <p className="text-gray-500 text-[10px] mb-6 flex items-center gap-2 font-bold uppercase tracking-widest">
-          Captured by <span className="text-white">{photo.photographer} <VerificationBadge type="photographer" size={10} /></span>
-        </p>
-        
-        <div className="flex gap-2">
-          <button className="flex-1 bg-white/5 border border-white/10 hover:bg-white/10 text-white text-[10px] font-black uppercase py-3 rounded-xl transition-all flex items-center justify-center gap-2">
-            <Info size={14} /> Details
-          </button>
-          <button 
-            onClick={() => addItem(photo)}
-            className="flex-1 bg-red-600 hover:bg-red-700 text-white text-[10px] font-black uppercase py-3 rounded-xl transition-all flex items-center justify-center gap-2 shadow-lg shadow-red-900/40"
-          >
-            <ShoppingCart size={14} /> Buy
-          </button>
-        </div>
+        {isPhotographerMode && (
+          <div className="mt-auto pt-6 border-t border-gray-100 flex items-center justify-between">
+             <span className="text-[8px] font-black text-gray-400 font-bold uppercase">Archive Net Payout</span>
+             <span className="text-[10px] font-black text-green-600 uppercase font-bold">KES {photo.price}</span>
+          </div>
+        )}
       </div>
-    </div>
+    </motion.div>
   );
 };
 

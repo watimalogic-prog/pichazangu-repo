@@ -174,7 +174,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onLogin }) => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 2, ease: "easeInOut" }}
+            transition={{ duration: 2.5, ease: "easeInOut" }}
             className="absolute inset-0 z-0"
           >
             <img 
@@ -182,25 +182,26 @@ const LandingPage: React.FC<LandingPageProps> = ({ onLogin }) => {
               className={`w-full h-full object-cover will-change-transform ${backgrounds[currentBg].effect}`} 
               alt="Pichazangu Cinematic"
             />
-            {/* Ultra-dark overlays for maximum text legibility */}
-            <div className="absolute inset-0 bg-gradient-to-b from-black/95 via-black/40 to-black/95" />
-            <div className="absolute inset-0 bg-black/50 mix-blend-multiply" />
+            {/* ENHANCED OVERLAYS: Deep vignettes for branding visibility */}
+            <div className="absolute inset-0 bg-gradient-to-b from-black/100 via-black/30 to-black/100" />
+            <div className="absolute inset-0 bg-black/40 mix-blend-multiply" />
+            <div className="absolute inset-x-0 top-0 h-96 bg-gradient-to-b from-black/80 to-transparent pointer-events-none" />
           </motion.div>
         </AnimatePresence>
 
         <motion.div style={{ opacity, y: y1 }} className="relative z-10 text-center px-6 max-w-6xl flex flex-col items-center">
-          {/* Logo container adjusted for full visibility with deeper backdrop shadow */}
+          {/* Enhanced radial shadow behind the brand title to ensure total visibility */}
           <div className="mb-16 relative flex items-center justify-center w-full max-w-[90vw]">
-             <div className="absolute inset-0 bg-black/90 blur-[130px] scale-125 rounded-full" />
+             <div className="absolute inset-0 bg-black/95 blur-[140px] scale-150 rounded-full opacity-80" />
              <div className="relative transform-gpu scale-90 md:scale-100 lg:scale-110">
-                <Logo size="lg" className="drop-shadow-[0_0_120px_rgba(227,30,36,1)] transition-all duration-700 hover:brightness-125" />
+                <Logo size="lg" className="drop-shadow-[0_0_120px_rgba(227,30,36,0.8)] transition-all duration-700 hover:brightness-125" />
              </div>
           </div>
           
-          <h1 className="font-embroidery text-6xl md:text-[10rem] italic leading-[0.8] stitched-text mb-10 text-glow drop-shadow-[0_10px_20px_rgba(0,0,0,1)]">
+          <h1 className="font-embroidery text-6xl md:text-[10rem] italic leading-[0.8] stitched-text mb-10 text-glow drop-shadow-[0_10px_30px_rgba(0,0,0,1)]">
             STITCHING <br/> <span className="font-embroidery-sketch text-[#E31E24]">AFRICAN</span> STORIES
           </h1>
-          <p className="text-xl md:text-3xl font-black uppercase tracking-[0.4em] text-white/95 mb-16 drop-shadow-[0_8px_16px_rgba(0,0,0,1)]">
+          <p className="text-xl md:text-3xl font-black uppercase tracking-[0.4em] text-white/95 mb-16 drop-shadow-[0_8px_20px_rgba(0,0,0,1)]">
             The Premier <span className="text-[#E31E24] text-glow">Media Hub</span> for East Africa
           </p>
           <div className="flex flex-col md:flex-row items-center justify-center gap-6">

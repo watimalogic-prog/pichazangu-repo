@@ -3,6 +3,7 @@
   "description": "A specialized stock photo and marketplace app for East Africa, supporting localized mobile money payments and authentic regional content.",
   "requestFramePermissions": [
     "camera",
+    "microphone",
     "geolocation"
   ]
 }

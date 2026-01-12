@@ -30,12 +30,24 @@ export interface UserProfile {
   phone?: string;
   verified: boolean;
   styleProfiles?: StyleProfile[];
+  biography?: string;
+  basePrice?: number;
+  performanceScore?: number;
 }
 
 export interface MarketState {
   vix: number;
   lastUpdate: string;
   tickerMessages: string[];
+}
+
+export interface PhotoFeedback {
+  id: string;
+  userId: string;
+  userName: string;
+  comment: string;
+  timestamp: string;
+  requestType?: 'Retouch' | 'Color' | 'Crop' | 'General';
 }
 
 export interface Photo {
@@ -46,6 +58,7 @@ export interface Photo {
   signedUrl?: string; 
   signedUrlExpiresAt?: number;
   title: string;
+  description?: string;
   photographer: string;
   price: number;
   category: string;
@@ -74,6 +87,43 @@ export interface Photo {
   volume24h?: number;
   historicalPrices?: { time: string; value: number }[];
   isIPPO?: boolean;
+  // Vault specific enhancements
+  isStarred?: boolean;
+  proofingStatus?: 'Pending' | 'Approved' | 'Rejected';
+  feedback?: PhotoFeedback[];
+  collectionId?: string;
+  discountedPrice?: number;
+}
+
+// DO add comment above each fix.
+// Added missing VaultCollection interface used for gallery categorization.
+export interface VaultCollection {
+  id: string;
+  name: string;
+  description: string;
+  coverUrl: string;
+}
+
+export interface Vault {
+  id: string;
+  clientId: string;
+  clientName: string;
+  clientEmail: string;
+  clientPhone: string;
+  clientAvatar: string;
+  photographerId: string;
+  photographerName: string;
+  passkey: string;
+  photoCount: number;
+  lastUpdated: string;
+  isPublic: boolean;
+  archiveStatus: 'Active' | 'Archived' | 'Permanent';
+  eventName?: string;
+  description?: string;
+  price?: number; // Total bundle price
+  // DO add comment above each fix.
+  // Updated status union to include 'preview' to fix type mismatch in mock data.
+  status?: 'locked' | 'unlocked' | 'paid' | 'preview';
 }
 
 export interface Transaction {
@@ -178,18 +228,6 @@ export interface CastingCall {
   location: string;
   agency: string;
   description: string;
-}
-
-export interface Vault {
-  id: string;
-  clientId: string;
-  photographerId?: string;
-  photographerName: string;
-  passkey: string;
-  photoCount: number;
-  lastUpdated: string;
-  isPublic: boolean;
-  archiveStatus: 'Active' | 'Archived' | 'Permanent';
 }
 
 export interface Milestone {

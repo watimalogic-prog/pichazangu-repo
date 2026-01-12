@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { HashRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import LandingPage from './pages/LandingPage';
 import Trending from './pages/Trending';
@@ -18,14 +18,27 @@ import StyleHub from './pages/StyleHub';
 import About from './pages/About';
 import Navigation from './components/Navigation';
 import GlobalToast from './components/GlobalToast';
-import { useUserStore } from './store/useAppStore';
+import { useUserStore, useThemeStore } from './store/useAppStore';
 
 const App: React.FC = () => {
   const { user, login, logout } = useUserStore();
+  const { theme } = useThemeStore();
+
+  // Apply theme to HTML root
+  useEffect(() => {
+    const root = window.document.documentElement;
+    if (theme === 'dark') {
+      root.classList.add('dark');
+      root.style.colorScheme = 'dark';
+    } else {
+      root.classList.remove('dark');
+      root.style.colorScheme = 'light';
+    }
+  }, [theme]);
 
   return (
     <Router>
-      <div className="min-h-screen">
+      <div className={`min-h-screen transition-colors duration-500 ${theme === 'dark' ? 'bg-black text-white' : 'bg-gray-50 text-gray-900'}`}>
         <Navigation 
           userRole={user?.role || null} 
           userName={user?.name || null}
@@ -53,6 +66,7 @@ const App: React.FC = () => {
               path="/client-profile" 
               element={user?.role === 'client' ? <ClientProfile /> : <Navigate to="/" />} 
             />
+            {/* Verify photographer dashboard route visibility */}
             <Route 
               path="/photographer-profile" 
               element={user?.role === 'photographer' ? <PhotographerProfile /> : <Navigate to="/" />} 

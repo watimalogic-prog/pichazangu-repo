@@ -3,6 +3,26 @@ import { persist } from 'zustand/middleware';
 import { Photo, CartItem, UserRole, UserProfile } from '../types';
 
 /**
+ * THEME STORE
+ */
+interface ThemeStore {
+  theme: 'light' | 'dark';
+  toggleTheme: () => void;
+}
+
+export const useThemeStore = create<ThemeStore>()(
+  persist(
+    (set) => ({
+      theme: 'dark', // Default to dark for the "Industrial Embroidery" aesthetic
+      toggleTheme: () => set((state) => ({ 
+        theme: state.theme === 'light' ? 'dark' : 'light' 
+      })),
+    }),
+    { name: 'pichazangu-theme' }
+  )
+);
+
+/**
  * USER IDENTITY STORE
  * Manages the global session and profile data.
  */
@@ -22,7 +42,7 @@ export const useUserStore = create<UserStore>()(
           photographer: {
             id: 'ph1',
             role: 'photographer',
-            name: 'Ali Photographer',
+            name: 'Ali Command',
             avatar: 'https://i.pravatar.cc/150?u=ali',
             location: 'Nairobi, Kenya',
             verified: true,
@@ -64,7 +84,6 @@ export const useUserStore = create<UserStore>()(
 
 /**
  * MARKET INTELLIGENCE STORE
- * Centralizes VIX and ticker messages to ensure consistency across pages.
  */
 interface MarketStore {
   vix: number;

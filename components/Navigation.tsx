@@ -18,11 +18,13 @@ import {
   ChevronDown,
   UserCircle,
   ShoppingCart,
-  Wand2
+  Wand2,
+  Sun,
+  Moon
 } from 'lucide-react';
 import { UserRole } from '../types';
 import VerificationBadge from './VerificationBadge';
-import { useCartStore } from '../store/useAppStore';
+import { useCartStore, useThemeStore } from '../store/useAppStore';
 
 interface NavigationProps {
   userRole: UserRole | null;
@@ -36,6 +38,7 @@ const Navigation: React.FC<NavigationProps> = ({ userRole, userName, onLogout, o
   const location = useLocation();
   const [showPersonaMenu, setShowPersonaMenu] = useState(false);
   const cartItems = useCartStore((state) => state.items);
+  const { theme, toggleTheme } = useThemeStore();
 
   const isLanding = location.pathname === '/';
   if (isLanding && !userRole) return null;
@@ -66,11 +69,11 @@ const Navigation: React.FC<NavigationProps> = ({ userRole, userName, onLogout, o
             <div className="bg-[#E31E24] text-white p-2.5 rounded-2xl group-hover:rotate-12 transition-transform shadow-[0_0_20px_rgba(227,30,36,0.4)]">
               <Camera size={24} />
             </div>
-            <div className="font-embroidery text-3xl text-white tracking-tighter uppercase italic">
+            <div className={`font-embroidery text-3xl tracking-tighter uppercase italic ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
               PICHA<span className="text-[#E31E24]">ZANGU</span>
             </div>
           </Link>
-          <div className="flex gap-1.5 overflow-x-auto scrollbar-hide max-w-[45vw] items-center">
+          <div className="flex gap-1.5 overflow-x-auto scrollbar-hide max-w-[40vw] items-center">
             {navItems.map((item) => (
               <Link
                 key={item.path}
@@ -78,7 +81,7 @@ const Navigation: React.FC<NavigationProps> = ({ userRole, userName, onLogout, o
                 className={`flex items-center gap-2 px-4 py-2.5 rounded-2xl transition-all text-[10px] font-black uppercase tracking-widest whitespace-nowrap border-2 ${
                   location.pathname === item.path 
                     ? 'bg-[#E31E24] text-white border-[#E31E24] shadow-xl shadow-red-900/20' 
-                    : 'text-white/40 border-transparent hover:text-white hover:bg-white/5'
+                    : `${theme === 'dark' ? 'text-white/40' : 'text-gray-400'} border-transparent hover:text-red-600 hover:bg-red-600/5`
                 }`}
               >
                 {item.icon} {item.label}
@@ -88,17 +91,26 @@ const Navigation: React.FC<NavigationProps> = ({ userRole, userName, onLogout, o
         </div>
         
         <div className="flex items-center gap-4">
-          <Link to="/vault-access" className="relative p-3 bg-white/5 border border-white/10 rounded-2xl text-white hover:bg-[#E31E24] transition-all group">
+          {/* THEME TOGGLE */}
+          <button 
+            onClick={toggleTheme}
+            className={`p-3 rounded-2xl transition-all border ${theme === 'dark' ? 'bg-white/5 border-white/10 text-yellow-500 hover:bg-white/10' : 'bg-gray-100 border-gray-200 text-gray-500 hover:bg-gray-200'}`}
+            title="Toggle Visual Mode"
+          >
+            {theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
+          </button>
+
+          <Link to="/vault-access" className={`relative p-3 border rounded-2xl transition-all group ${theme === 'dark' ? 'bg-white/5 border-white/10 text-white' : 'bg-gray-100 border-gray-200 text-gray-900'} hover:bg-[#E31E24] hover:text-white hover:border-[#E31E24]`}>
              <ShoppingCart size={20} />
              {cartItems.length > 0 && (
-               <span className="absolute -top-1 -right-1 w-5 h-5 bg-[#E31E24] border-2 border-black rounded-full text-[10px] font-black flex items-center justify-center animate-pulse group-hover:animate-bounce">
+               <span className="absolute -top-1 -right-1 w-5 h-5 bg-[#E31E24] border-2 border-black rounded-full text-[10px] font-black flex items-center justify-center animate-pulse group-hover:animate-bounce text-white">
                   {cartItems.length}
                </span>
              )}
           </Link>
 
           {userRole ? (
-            <div className="flex items-center gap-3 bg-white/5 p-1.5 pr-4 rounded-2xl border border-white/10 relative">
+            <div className={`flex items-center gap-3 p-1.5 pr-4 rounded-2xl border relative ${theme === 'dark' ? 'bg-white/5 border-white/10' : 'bg-gray-100 border-gray-200'}`}>
               <div className="relative group">
                 <button 
                   onClick={() => setShowPersonaMenu(!showPersonaMenu)}
@@ -109,7 +121,7 @@ const Navigation: React.FC<NavigationProps> = ({ userRole, userName, onLogout, o
                   </div>
                   <div className="text-left hidden lg:block">
                     <div className="flex items-center gap-1">
-                      <span className="text-[10px] font-black text-white uppercase tracking-tighter truncate max-w-[80px]">{userName}</span>
+                      <span className={`text-[10px] font-black uppercase tracking-tighter truncate max-w-[80px] ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{userName}</span>
                       <VerificationBadge type={userRole} size={12} />
                     </div>
                     <span className="text-[8px] font-black text-gray-500 uppercase tracking-widest block">{userRole === 'media' ? 'Media House' : userRole}</span>
@@ -118,8 +130,8 @@ const Navigation: React.FC<NavigationProps> = ({ userRole, userName, onLogout, o
                 </button>
 
                 {showPersonaMenu && (
-                  <div className="absolute top-full right-0 mt-4 w-64 bg-black border border-white/10 rounded-3xl shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-200 z-[110]">
-                    <div className="p-4 border-b border-white/5 bg-white/5">
+                  <div className={`absolute top-full right-0 mt-4 w-64 border rounded-3xl shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-200 z-[110] ${theme === 'dark' ? 'bg-black border-white/10' : 'bg-white border-gray-200'}`}>
+                    <div className={`p-4 border-b ${theme === 'dark' ? 'border-white/5 bg-white/5' : 'border-gray-100 bg-gray-50'}`}>
                       <span className="text-[8px] font-black text-gray-500 uppercase tracking-widest block mb-4">Switch Persona</span>
                       <div className="space-y-2">
                         <PersonaBtn label="Photographer" active={userRole === 'photographer'} onClick={() => {onRoleSwitch('photographer'); setShowPersonaMenu(false);}} />
@@ -129,11 +141,11 @@ const Navigation: React.FC<NavigationProps> = ({ userRole, userName, onLogout, o
                     </div>
                     <div className="p-2">
                       {userRole === 'photographer' && (
-                        <Link to="/style-lab" onClick={() => setShowPersonaMenu(false)} className="flex items-center gap-3 w-full p-4 text-[10px] font-black uppercase text-white hover:bg-white/5 rounded-2xl transition-all">
+                        <Link to="/style-lab" onClick={() => setShowPersonaMenu(false)} className={`flex items-center gap-3 w-full p-4 text-[10px] font-black uppercase rounded-2xl transition-all ${theme === 'dark' ? 'text-white hover:bg-white/5' : 'text-gray-900 hover:bg-gray-100'}`}>
                           <Wand2 size={18} className="text-red-600" /> AI Style Lab
                         </Link>
                       )}
-                      <Link to={profilePath} onClick={() => setShowPersonaMenu(false)} className="flex items-center gap-3 w-full p-4 text-[10px] font-black uppercase text-white hover:bg-white/5 rounded-2xl transition-all">
+                      <Link to={profilePath} onClick={() => setShowPersonaMenu(false)} className={`flex items-center gap-3 w-full p-4 text-[10px] font-black uppercase rounded-2xl transition-all ${theme === 'dark' ? 'text-white hover:bg-white/5' : 'text-gray-900 hover:bg-gray-100'}`}>
                         <UserCircle size={18} className="text-[#E31E24]" /> My Dashboard
                       </Link>
                       <button onClick={() => {onLogout(); setShowPersonaMenu(false);}} className="flex items-center gap-3 w-full p-4 text-[10px] font-black uppercase text-red-500 hover:bg-red-500/10 rounded-2xl transition-all">
@@ -166,34 +178,45 @@ const Navigation: React.FC<NavigationProps> = ({ userRole, userName, onLogout, o
       </nav>
 
       {/* Mobile Tab Bar */}
-      <nav className="md:hidden fixed bottom-0 left-0 right-0 h-20 glass border-t border-white/10 z-[100] flex items-center justify-around px-4 pb-2">
+      <nav className={`md:hidden fixed bottom-0 left-0 right-0 h-20 glass border-t z-[100] flex items-center justify-around px-4 pb-2 transition-colors ${theme === 'dark' ? 'border-white/10' : 'bg-white border-gray-200'}`}>
         <TabItem to="/trending" icon={<TrendingUp size={24} />} label="Feed" active={location.pathname === '/trending'} />
         <TabItem to="/stock" icon={<Activity size={24} />} label="Market" active={location.pathname === '/stock'} />
         <TabItem to="/gigz" icon={<Briefcase size={24} />} label="Gigs" active={location.pathname === '/gigz'} />
         <TabItem to={userRole ? profilePath : '/'} icon={userRole ? <User size={24} /> : <LogIn size={24} />} label={userRole ? (userRole === 'media' ? 'Press' : 'Profile') : "Login"} active={location.pathname.includes('profile') || location.pathname.includes('media-house') || (location.pathname === '/' && !userRole)} />
-        <TabItem to="/about" icon={<Eye size={24} />} label="Vision" active={location.pathname === '/about'} />
+        <button onClick={toggleTheme} className={`flex flex-col items-center gap-1.5 transition-all ${theme === 'dark' ? 'text-yellow-500' : 'text-gray-400'}`}>
+          <div className={`p-2 rounded-xl transition-all ${theme === 'dark' ? 'bg-yellow-500/10' : ''}`}>
+             {theme === 'dark' ? <Sun size={24} /> : <Moon size={24} />}
+          </div>
+          <span className="text-[9px] font-black uppercase tracking-widest">{theme === 'dark' ? 'Light' : 'Dark'}</span>
+        </button>
       </nav>
     </>
   );
 };
 
-const PersonaBtn = ({ label, active, onClick }: { label: string, active: boolean, onClick: () => void }) => (
-  <button 
-    onClick={onClick}
-    className={`w-full flex items-center justify-between p-3 rounded-xl transition-all ${active ? 'bg-[#E31E24] text-white shadow-lg' : 'bg-white/5 text-gray-400 hover:bg-white/10 hover:text-white'}`}
-  >
-    <span className="text-[10px] font-black uppercase tracking-widest">{label}</span>
-    {active && <div className="w-1.5 h-1.5 bg-white rounded-full" />}
-  </button>
-);
+const PersonaBtn = ({ label, active, onClick }: { label: string, active: boolean, onClick: () => void }) => {
+  const { theme } = useThemeStore();
+  return (
+    <button 
+      onClick={onClick}
+      className={`w-full flex items-center justify-between p-3 rounded-xl transition-all ${active ? 'bg-[#E31E24] text-white shadow-lg' : `${theme === 'dark' ? 'bg-white/5 text-gray-400 hover:bg-white/10 hover:text-white' : 'bg-gray-100 text-gray-500 hover:bg-gray-200'}`}`}
+    >
+      <span className="text-[10px] font-black uppercase tracking-widest">{label}</span>
+      {active && <div className="w-1.5 h-1.5 bg-white rounded-full" />}
+    </button>
+  );
+};
 
-const TabItem = ({ to, icon, label, active }: { to: string, icon: any, label: string, active: boolean }) => (
-  <Link to={to} className={`flex flex-col items-center gap-1.5 transition-all ${active ? 'text-[#E31E24] scale-110' : 'text-white/40'}`}>
-    <div className={`p-2 rounded-xl transition-all ${active ? 'bg-[#E31E24]/10 text-[#E31E24]' : ''}`}>
-       {icon}
-    </div>
-    <span className="text-[9px] font-black uppercase tracking-widest">{label}</span>
-  </Link>
-);
+const TabItem = ({ to, icon, label, active }: { to: string, icon: any, label: string, active: boolean }) => {
+  const { theme } = useThemeStore();
+  return (
+    <Link to={to} className={`flex flex-col items-center gap-1.5 transition-all ${active ? 'text-[#E31E24] scale-110' : `${theme === 'dark' ? 'text-white/40' : 'text-gray-400'}`}`}>
+      <div className={`p-2 rounded-xl transition-all ${active ? 'bg-[#E31E24]/10 text-[#E31E24]' : ''}`}>
+         {icon}
+      </div>
+      <span className="text-[9px] font-black uppercase tracking-widest">{label}</span>
+    </Link>
+  );
+};
 
 export default Navigation;
