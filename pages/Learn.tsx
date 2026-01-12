@@ -9,7 +9,9 @@ import {
   Volume2, Fingerprint, Crosshair, Hand, Smile, Box, Timer, Leaf,
   Image as ImageIcon, HelpCircle, Activity, ShieldCheck,
   Settings, Layers, Cpu, Database, Eye, ZapOff, FlaskConical, Binary, Microscope,
-  Wind, Ghost, Palette, Lightbulb, UserCheck, Flame
+  Wind, Ghost, Palette, Lightbulb, UserCheck, Flame, Scale, Scissors,
+  // Fixed 'Cannot find name ScanFace' and 'Cannot find name BarChart3' by adding them to the lucide-react import list.
+  ScanFace, BarChart3
 } from 'lucide-react';
 import { MOCK_ACADEMY_COURSES } from '../constants';
 import { AcademyCourse, Lesson } from '../types';
@@ -206,37 +208,341 @@ const ModuleOneContent = () => (
 );
 
 const ModuleThreeContent = () => (
-  <div className="space-y-20 pb-32">
+  <div className="space-y-24 pb-40">
+    {/* HERO SECTION */}
     <div className="space-y-10">
-      <div className="relative h-[500px] rounded-[4rem] overflow-hidden group shadow-2xl border border-white/5">
+      <div className="relative h-[600px] rounded-[4.5rem] overflow-hidden group shadow-2xl border border-white/5">
         <img src="https://images.unsplash.com/photo-1516035069371-29a1b244cc32?auto=format&fit=crop&w=1600&q=80" className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-1000 group-hover:scale-105" alt="Vintage Camera Mechanism" />
-        <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent" />
-        <div className="absolute bottom-12 left-12 right-12">
-          <div className="flex items-center gap-3 mb-4">
-            <History size={24} className="text-red-600" />
-            <span className="text-[10px] font-black text-red-600 uppercase tracking-widest">Heritage Node 03.1</span>
+        <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent" />
+        <div className="absolute bottom-16 left-16 right-16">
+          <div className="flex items-center gap-4 mb-6">
+            <History size={32} className="text-red-600" />
+            <span className="text-xs font-black text-red-600 uppercase tracking-[0.5em]">Heritage Node 03.1</span>
           </div>
-          <h2 className="font-embroidery text-6xl text-white italic leading-none">THE TACTILE GHOSTS OF THE <br/> <span className="font-embroidery-sketch">MECHANICAL AGE</span></h2>
+          <h2 className="font-embroidery text-7xl md:text-9xl text-white italic leading-none">OLD FEATURES <br/> <span className="font-embroidery-sketch">MODERN MASTERY</span></h2>
         </div>
       </div>
-      <div className="prose prose-invert max-w-none space-y-8 mt-10">
-        <p className="text-xl text-gray-400 font-medium leading-relaxed uppercase tracking-tight">Every dial, slider, and menu item in a modern Nikon, Sony, or Canon body is a digital simulation of a physical process that photographers used for over a century. In the "Old World," there was no "Auto" mode; there were only the physical properties of light, metal, and glass.</p>
+
+      <div className="prose prose-invert max-w-none space-y-10">
+        <p className="text-2xl text-gray-400 font-medium leading-relaxed uppercase tracking-tight">
+          To master a modern camera, you must respect its ancestors. Every digital setting you see today is a digital simulation of a physical, mechanical process from the 20th century. In the "Old World," features were tactile. To change your "ISO" (sensitivity), you had to physically open the back of the camera and swap the roll of film. To change your shutter speed, you turned a heavy metal dial that wound a spring.
+        </p>
+        <p className="text-xl text-gray-400 leading-relaxed uppercase">
+          In East Africa, many of our legendary photojournalists started on these mechanical beasts. They learned the "feel" of the camera. As a Pichazangu student, understanding these features helps you troubleshoot. When your digital camera fails to focus, knowing how a manual "Rangefinder" worked helps you understand how to fix it yourself.
+        </p>
       </div>
+    </div>
+
+    {/* SECTION 1: THE TACTILE ANCESTORS */}
+    <div className="grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
+      <div className="space-y-10">
+        <div className="flex items-center gap-4">
+           <div className="w-16 h-16 bg-red-600 rounded-[2rem] flex items-center justify-center shadow-[0_0_40px_rgba(227,30,36,0.4)]">
+              <Scale size={36} />
+           </div>
+           <h3 className="font-embroidery text-5xl italic text-white uppercase">The Tactile Ancestors</h3>
+        </div>
+        <div className="space-y-8">
+           <p className="text-gray-400 text-lg leading-relaxed font-medium uppercase">
+              The history of the camera is a history of physical movement. Before touchscreens and menus, every change required a mechanical action.
+           </p>
+           <div className="grid grid-cols-1 gap-6">
+              <LegacyFeature 
+                icon={<CircleIcon size={24}/>} 
+                title="The Aperture Ring" 
+                desc="On old lenses, you twisted a ring on the lens itself to physically move the 'blades.' Today, most cameras control this via a thumbwheel on the body." 
+              />
+              <LegacyFeature 
+                icon={<Binary size={24}/>} 
+                title="The ISO/ASA Dial" 
+                desc="Previously fixed by the film type (e.g., Kodak 400). Modern cameras have 'Auto-ISO,' allowing the camera to adjust sensitivity instantly." 
+              />
+              <LegacyFeature 
+                icon={<Activity size={24}/>} 
+                title="The Film Advance Lever" 
+                desc="That satisfying 'crank' sound after every shot. Today, we have 'Burst Mode,' taking 30 photos in a single second." 
+              />
+           </div>
+        </div>
+      </div>
+      <div className="space-y-6">
+        <div className="aspect-square rounded-[4rem] overflow-hidden border border-white/10 shadow-2xl relative group">
+           <img src="https://images.unsplash.com/photo-1495707902641-75cac588d2e9?auto=format&fit=crop&w=1200&q=80" className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-1000" alt="Vintage Dial" />
+           <div className="absolute inset-0 bg-black/40" />
+           <div className="absolute inset-0 flex items-center justify-center">
+              <History size={120} className="text-white/10" />
+           </div>
+        </div>
+        <p className="text-[11px] font-black text-gray-600 uppercase tracking-[0.5em] text-center">[Visual Node 3.2: Mechanical Dial Architecture of a 1970s SLR]</p>
+      </div>
+    </div>
+
+    {/* SECTION 2: THE DIGITAL BRAIN */}
+    <div className="bg-white text-black p-16 rounded-[4.5rem] relative overflow-hidden">
+       <div className="relative z-10 space-y-12">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-8">
+             <div>
+                <div className="flex items-center gap-4 mb-4">
+                   <Cpu size={32} className="text-red-600" />
+                   <span className="text-red-600 font-black text-[11px] uppercase tracking-[0.5em]">Silicon Evolution</span>
+                </div>
+                <h2 className="font-embroidery text-6xl md:text-8xl italic leading-tight">MODERN FEATURES: <br/><span className="font-embroidery-sketch text-red-600">THE BRAIN</span></h2>
+             </div>
+             <p className="max-w-xl text-lg font-medium text-gray-500 leading-relaxed uppercase">
+                Modern cameras like the ones used by Pichazangu Pros have features the pioneers never dreamed of. We have moved from physics to computation.
+             </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+             <ModernFeatureCard 
+                icon={<Activity/>}
+                title="IBIS"
+                desc="In-Body Image Stabilization. A floating sensor that cancels out hand tremors, allowing for sharp shots even in low light."
+             />
+             <ModernFeatureCard 
+                icon={<ScanFace/>}
+                title="EYE-TRACKING AF"
+                desc="The camera uses AI to find the eye of a lion or a bride and keeps it sharp, even if they are moving at high speed."
+             />
+             <ModernFeatureCard 
+                icon={<BarChart3/>}
+                title="HISTOGRAM"
+                desc="A digital graph that tells you if your photo is too dark or too bright before you even take the shot. No more guesswork."
+             />
+          </div>
+       </div>
+       <div className="absolute top-0 right-0 p-20 opacity-[0.03] select-none pointer-events-none text-[35rem] font-embroidery whitespace-nowrap rotate-12">
+          シリコン
+       </div>
+    </div>
+
+    {/* PRO TIP: RED PROTOCOL */}
+    <div className="p-16 bg-red-600 rounded-[4rem] text-white shadow-3xl relative overflow-hidden group">
+       <div className="relative z-10 max-w-4xl">
+          <div className="flex items-center gap-4 mb-8">
+             <Zap size={32} className="fill-current" />
+             <span className="text-xs font-black uppercase tracking-[0.5em]">The Pro Tip (RED)</span>
+          </div>
+          <h3 className="font-embroidery text-6xl md:text-8xl italic leading-none mb-10">DON'T BE A <br/><span className="font-embroidery-sketch text-black">TOURIST.</span></h3>
+          <p className="text-xl md:text-2xl font-bold uppercase tracking-tight leading-relaxed mb-12">
+             Don't get distracted by "Scene Modes" (like Portrait or Sports mode). These are for tourists. A Pichazangu Pro uses 'Aperture Priority' or 'Manual' to take full creative control of the narrative.
+          </p>
+       </div>
+       <Globe size={400} className="absolute -right-20 -bottom-20 opacity-10 rotate-12 group-hover:rotate-0 transition-transform duration-700" />
+    </div>
+
+    {/* EXPERIMENTAL TIP */}
+    <div className="space-y-12">
+       <div className="bg-white/5 border border-white/10 p-16 rounded-[4rem] relative overflow-hidden group">
+          <div className="relative z-10 max-w-4xl">
+             <div className="flex items-center gap-4 mb-10">
+                <Volume2 size={32} className="text-red-600 animate-pulse" />
+                <h2 className="font-embroidery text-5xl text-white italic">PRACTICAL: <span className="text-red-600">SOUND OF SPEED</span></h2>
+             </div>
+             <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
+                <div className="space-y-6">
+                   <p className="text-gray-400 text-lg uppercase font-medium leading-relaxed">
+                      Set your camera to "Shutter Priority" (S or Tv mode). Take a photo at 1/10th of a second, then take one at 1/1000th of a second.
+                   </p>
+                   <div className="space-y-4">
+                      <Step num="01" text="Listen to the click. The first will be a slow, 'ker-thunk'." />
+                      <Step num="02" text="The second will be a sharp, 'tick'." />
+                      <Step num="03" text="This exercise trains your ears to recognize shutter speed without looking at the screen." />
+                   </div>
+                </div>
+                <div className="bg-black p-10 rounded-[3rem] border border-white/5 flex flex-col justify-center text-center">
+                   <Clock size={64} className="text-red-600 mx-auto mb-8" />
+                   <h4 className="text-2xl font-black text-white mb-4 uppercase">BUILD SONIC MEMORY</h4>
+                   <p className="text-gray-500 text-sm font-bold leading-relaxed uppercase tracking-widest">
+                      "A master knows the state of the machine by the rhythm of its mechanics. Listen to the light."
+                   </p>
+                </div>
+             </div>
+          </div>
+       </div>
     </div>
   </div>
 );
 
 const ModuleFourContent = () => (
-  <div className="space-y-12 pb-20">
-    <div className="space-y-6">
-      <h2 className="text-4xl font-black uppercase tracking-tighter text-white">I. The Professional Grip</h2>
-      <p className="text-lg leading-relaxed text-gray-400 uppercase">The most common mistake amateurs make is holding the camera like a smartphone. To shoot for Pichazangu, you need stability.</p>
+  <div className="space-y-24 pb-40">
+    {/* HERO SECTION */}
+    <div className="space-y-10">
+      <div className="relative h-[600px] rounded-[4.5rem] overflow-hidden group shadow-2xl border border-white/5">
+        <img src="https://images.unsplash.com/photo-1554048612-b6a482bc67e5?auto=format&fit=crop&w=1600&q=80" className="w-full h-full object-cover group-hover:scale-105 transition-all duration-1000" alt="Professional Grip" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent" />
+        <div className="absolute bottom-16 left-16 right-16">
+          <div className="flex items-center gap-4 mb-6">
+            <Hand size={32} className="text-red-600" />
+            <span className="text-xs font-black text-red-600 uppercase tracking-[0.5em]">Biomechanics Node 04.1</span>
+          </div>
+          <h2 className="font-embroidery text-7xl md:text-9xl text-white italic leading-none">THE HANDSHAKE: <br/> <span className="font-embroidery-sketch">THE GRIP</span></h2>
+        </div>
+      </div>
+
+      <div className="prose prose-invert max-w-none space-y-10">
+        <p className="text-2xl text-gray-400 font-medium leading-relaxed uppercase tracking-tight">
+          The most common mistake amateurs make is holding the camera like a smartphone. To shoot for Pichazangu, you need stability. You are not just holding a device; you are anchoring a scientific instrument to your skeleton.
+        </p>
+        <p className="text-xl text-gray-400 leading-relaxed uppercase">
+          Stability is the foundation of sharpness. In a busy Nairobi street or a dark event hall, you cannot always rely on high ISO. You must rely on your bones. This module teaches you the physical protocols for turning your body into a solid media node.
+        </p>
+      </div>
     </div>
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-       <div className="p-10 bg-white/5 rounded-[3rem] border border-white/10 text-center">
-          <Hand className="text-red-600 mx-auto mb-4" />
-          <h4 className="font-black text-xs uppercase tracking-widest text-white">The Cradle</h4>
-          <p className="text-[10px] text-gray-500 uppercase mt-2">Left hand underneath the lens, supporting the weight.</p>
+
+    {/* SECTION 1: THE PROFESSIONAL GRIP */}
+    <div className="grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
+      <div className="space-y-10">
+        <div className="flex items-center gap-4">
+           <div className="w-16 h-16 bg-red-600 rounded-[2rem] flex items-center justify-center shadow-[0_0_40px_rgba(227,30,36,0.4)]">
+              <Crosshair size={36} />
+           </div>
+           <h3 className="font-embroidery text-5xl italic text-white uppercase">The Human Tripod</h3>
+        </div>
+        <div className="space-y-6">
+           <GripPoint 
+              num="01" 
+              title="The Left Hand: The Cradle" 
+              desc="This is your primary support. It should sit underneath the lens, supporting the full weight of the glass and allowing your fingers to zoom or focus." 
+           />
+           <GripPoint 
+              num="02" 
+              title="The Right Hand: The Trigger" 
+              desc="Your palm should wrap firmly around the grip, with your index finger resting lightly on the shutter. Do not 'clutch' too hard; stay fluid." 
+           />
+           <GripPoint 
+              num="03" 
+              title="The Anchor: The Chassis" 
+              desc="Tuck your elbows into your ribs and stand with your feet shoulder-width apart. You have now turned your skeletal system into a human tripod." 
+           />
+        </div>
+      </div>
+      <div className="relative">
+         <div className="aspect-[3/4] rounded-[4rem] overflow-hidden border border-white/5 shadow-2xl relative group bg-[#0a0a0a]">
+            <img src="https://images.unsplash.com/photo-1516035069371-29a1b244cc32?auto=format&fit=crop&w=1200&q=80" className="w-full h-full object-cover opacity-20" alt="Grip Diagram" />
+            <div className="absolute inset-0 flex items-center justify-center">
+               <div className="space-y-8 w-full px-12">
+                  <div className="h-0.5 bg-red-600/50 w-full relative"><div className="absolute -top-1.5 left-0 w-3 h-3 bg-red-600 rounded-full" /></div>
+                  <div className="h-0.5 bg-red-600/50 w-2/3 relative"><div className="absolute -top-1.5 left-0 w-3 h-3 bg-red-600 rounded-full" /></div>
+                  <div className="h-0.5 bg-red-600/50 w-full relative"><div className="absolute -top-1.5 left-0 w-3 h-3 bg-red-600 rounded-full" /></div>
+               </div>
+            </div>
+         </div>
+         <p className="text-[11px] font-black text-gray-600 uppercase tracking-[0.5em] text-center mt-6">[Visual Node 4.2: Biomechanical Anchor Points for Handheld Stability]</p>
+      </div>
+    </div>
+
+    {/* SECTION 2: NAVIGATING THE MENU */}
+    <div className="bg-white text-black p-16 rounded-[4.5rem] relative overflow-hidden">
+       <div className="relative z-10 space-y-12">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-8">
+             <div>
+                <div className="flex items-center gap-4 mb-4">
+                   <Settings size={32} className="text-red-600" />
+                   <span className="text-red-600 font-black text-[11px] uppercase tracking-[0.5em]">Command Logic</span>
+                </div>
+                <h2 className="font-embroidery text-6xl md:text-8xl italic leading-tight">THE MENU <br/><span className="font-embroidery-sketch text-red-600">SYSTEM</span></h2>
+             </div>
+             <p className="max-w-xl text-lg font-medium text-gray-500 leading-relaxed uppercase">
+                Every camera brand (Canon, Nikon, Sony, Fujifilm) has a different "language," but they all share a core menu structure. You must learn to find three things instantly.
+             </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+             <MenuNode 
+                icon={<HardDrive/>}
+                title="FORMAT CARD"
+                desc="The most important button before any session. It deletes everything and resets the file structure. Use with extreme caution."
+             />
+             <MenuNode 
+                icon={<ImageIcon/>}
+                title="IMAGE QUALITY"
+                desc="Always ensure you are set to RAW for the highest fidelity. JPEGs are for social media; RAW files are for the Pichazangu Archive."
+             />
+             <MenuNode 
+                icon={<Crosshair/>}
+                title="FOCUS MODE"
+                desc="Switching between 'Single' for portraits and 'Continuous' (AF-C/Servo) for action or sports. Know this toggle by touch."
+             />
+          </div>
+       </div>
+       <div className="absolute top-0 right-0 p-20 opacity-[0.03] select-none pointer-events-none text-[35rem] font-embroidery whitespace-nowrap rotate-12">
+          MENU
+       </div>
+    </div>
+
+    {/* SECTION 3: THE WORKFLOW CHECKLIST */}
+    <div className="space-y-16">
+       <div className="text-center space-y-6">
+          <h3 className="font-embroidery text-6xl italic text-white uppercase">THE <span className="text-red-600 font-embroidery-sketch">WORKFLOW</span> CHECKLIST</h3>
+          <p className="text-gray-500 font-black text-xs uppercase tracking-[0.6em]">Zero-Error Protocol for Regional Assignments</p>
+       </div>
+
+       <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
+          <div className="bg-[#0a0a0a] border border-white/5 rounded-[4rem] p-12 space-y-10">
+             <div className="space-y-8">
+                <ChecklistItem num="01" title="Power & Storage" desc="Check your battery and card. Nothing is worse than arriving at a wedding with a dead battery." />
+                <ChecklistItem num="02" title="Light Temperature" desc="Set your White Balance. Match the camera to the light (Sun, Shade, or Fluorescent)." />
+                <ChecklistItem num="03" title="Calibration" desc="Check your Exposure. Look at the meter in your viewfinder. Is it sitting at '0'?" />
+                <ChecklistItem num="04" title="Composition" desc="Focus, Recompose, Shoot. Focus on the eyes, move for a better crop, then squeeze." />
+             </div>
+          </div>
+          <div className="relative rounded-[4rem] overflow-hidden border border-white/5 shadow-2xl">
+             <img src="https://images.unsplash.com/photo-1511795409834-ef04bbd61622?auto=format&fit=crop&w=1200&q=80" className="w-full h-full object-cover grayscale opacity-30" alt="Workflow Context" />
+             <div className="absolute inset-0 bg-gradient-to-t from-black to-transparent" />
+             <div className="absolute bottom-10 left-10 right-10">
+                <div className="bg-red-600 p-6 rounded-3xl shadow-2xl">
+                   <h4 className="text-white font-black text-xs uppercase mb-2">Pichazangu Field Protocol</h4>
+                   <p className="text-white/80 text-xs font-bold leading-relaxed uppercase">"A pro is someone who makes the machine invisible so the story can shine. Follow the checklist, then forget the gear."</p>
+                </div>
+             </div>
+          </div>
+       </div>
+    </div>
+
+    {/* PRO TIP: RED PROTOCOL */}
+    <div className="p-16 bg-red-600 rounded-[4rem] text-white shadow-3xl relative overflow-hidden group">
+       <div className="relative z-10 max-w-4xl">
+          <div className="flex items-center gap-4 mb-8">
+             <Zap size={32} className="fill-current" />
+             <span className="text-xs font-black uppercase tracking-[0.5em]">The Pro Tip (RED)</span>
+          </div>
+          <h3 className="font-embroidery text-6xl md:text-8xl italic leading-none mb-10">THE <br/><span className="font-embroidery-sketch text-black">HEARTBEAT.</span></h3>
+          <p className="text-xl md:text-2xl font-bold uppercase tracking-tight leading-relaxed mb-12">
+             Treat your shutter button like a heartbeat. A gentle squeeze produces a sharp image; a violent poke produces a blurry one. Sync your press with your exhale for the ultimate stability.
+          </p>
+       </div>
+       <Zap size={400} className="absolute -right-20 -bottom-20 opacity-10 rotate-12 group-hover:rotate-0 transition-transform duration-700" />
+    </div>
+
+    {/* EXPERIMENTAL TIP */}
+    <div className="space-y-12">
+       <div className="bg-white/5 border border-white/10 p-16 rounded-[4rem] relative overflow-hidden group">
+          <div className="relative z-10 max-w-4xl">
+             <div className="flex items-center gap-4 mb-10">
+                <Fingerprint size={32} className="text-red-600 animate-pulse" />
+                <h2 className="font-embroidery text-5xl text-white italic">PRACTICAL: <span className="text-red-600">THE BLIND CHALLENGE</span></h2>
+             </div>
+             <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
+                <div className="space-y-6">
+                   <p className="text-gray-400 text-lg uppercase font-medium leading-relaxed">
+                      In professional photography, things happen fast. If you have to look down at your buttons, you will miss the shot.
+                   </p>
+                   <div className="space-y-4">
+                      <Step num="01" text="In a dimly lit room, try to change your ISO and Aperture settings without looking." />
+                      <Step num="02" text="Use the dials and feel the 'clicks'. Memorize the geography of your body." />
+                      <Step num="03" text="Try to navigate to 'Format Card' within the menu system with your eyes closed." />
+                   </div>
+                </div>
+                <div className="bg-black p-10 rounded-[3rem] border border-white/5 flex flex-col justify-center text-center">
+                   <Target size={64} className="text-red-600 mx-auto mb-8" />
+                   <h4 className="text-2xl font-black text-white mb-4 uppercase">BUILD MUSCLE MEMORY</h4>
+                   <p className="text-gray-500 text-sm font-bold leading-relaxed uppercase tracking-widest">
+                      "If you can't operate your camera in total darkness, you are not yet a master of the machine. The handshake must be instinctual."
+                   </p>
+                </div>
+             </div>
+          </div>
        </div>
     </div>
   </div>
@@ -252,172 +558,17 @@ const ModuleFiveContent = () => (
 );
 
 const ModuleSixContent = () => (
-  <div className="space-y-24 pb-40">
-    {/* HERO SECTION: THE PSYCHOLOGICAL HANDSHAKE */}
-    <div className="space-y-10">
-      <div className="relative h-[600px] rounded-[4.5rem] overflow-hidden group shadow-2xl border border-white/5">
-        <img src="https://images.unsplash.com/photo-1531123897727-8f129e1688ce?auto=format&fit=crop&w=1600&q=80" className="w-full h-full object-cover group-hover:scale-105 transition-all duration-1000" alt="Emotive Portrait" />
-        <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent" />
-        <div className="absolute bottom-16 left-16 right-16">
-          <div className="flex items-center gap-4 mb-6">
-            <Smile size={32} className="text-red-600" />
-            <span className="text-xs font-black text-red-600 uppercase tracking-[0.5em]">Psychology Node 06.1</span>
-          </div>
-          <h2 className="font-embroidery text-7xl md:text-9xl text-white italic leading-none">ENGAGING THE <br/> <span className="font-embroidery-sketch">HUMAN SOUL</span></h2>
-        </div>
-      </div>
-
-      <div className="prose prose-invert max-w-none space-y-10">
-        <p className="text-2xl text-gray-400 font-medium leading-relaxed uppercase tracking-tight">
-          A portrait is not a picture of a face; it is a document of an interaction. To be a portraitist in the Pichazangu ecosystem is to be a <b>Director of Emotion</b>. Whether you are shooting a corporate CEO in Upper Hill or a traditional elder in the Great Rift Valley, your camera is secondary to your presence.
-        </p>
-        <p className="text-xl text-gray-400 leading-relaxed uppercase">
-          In East Africa, people are naturally vibrant and expressive, but the "black box" of a professional lens can cause subjects to freeze. This module teaches you how to dissolve the barrier between the sensor and the soul, ensuring your Private Vaults are filled with authentic, high-value human connections.
-        </p>
-      </div>
+  <div className="space-y-12 pb-20">
+    <div className="space-y-6">
+      <h2 className="text-4xl font-black uppercase tracking-tighter text-white">I. The Art of the Human Soul</h2>
+      <p className="text-lg leading-relaxed text-gray-400 uppercase">
+        Portraiture is the foundation of the Pichazangu Private Vault system. It is the most consistent way to earn a living in the region.
+      </p>
     </div>
-
-    {/* SECTION 1: THE CATCHLIGHT PROTOCOL */}
-    <div className="grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
-      <div className="space-y-10">
-        <div className="flex items-center gap-4">
-           <div className="w-16 h-16 bg-red-600 rounded-[2rem] flex items-center justify-center shadow-[0_0_40px_rgba(227,30,36,0.4)]">
-              <Eye size={36} />
-           </div>
-           <h3 className="font-embroidery text-5xl italic text-white uppercase">The Hook: Catchlights</h3>
-        </div>
-        <div className="space-y-8">
-           <p className="text-gray-400 text-lg leading-relaxed font-medium uppercase">
-              The "Catchlight" is the tiny white reflection of a light source in the subject's eyes. In the professional world, this reflection is the signal of life. Without it, the eyes look flat, "dead," and the portrait fails to connect with the viewer.
-           </p>
-           <div className="bg-white/5 border border-white/10 p-10 rounded-[3.5rem] relative overflow-hidden group">
-              <Lightbulb size={24} className="text-red-600 mb-6" />
-              <h4 className="text-sm font-black text-white uppercase tracking-widest mb-4">Geometric Placement</h4>
-              <p className="text-xs text-gray-500 uppercase font-bold leading-relaxed">
-                For a natural look, aim for the catchlight to be at the "10 o'clock" or "2 o'clock" position in the pupil. This simulates natural sky-light and gives the face a three-dimensional, intelligent quality.
-              </p>
-           </div>
-        </div>
-      </div>
-      <div className="space-y-6">
-        <div className="aspect-[4/5] rounded-[4rem] overflow-hidden border border-white/10 shadow-2xl relative group bg-[#0a0a0a] flex items-center justify-center">
-           <div className="absolute inset-0 opacity-20">
-              <img src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=1200&q=80" className="w-full h-full object-cover" alt="Detail Eye" />
-           </div>
-           <div className="relative z-10 text-center p-12">
-              <div className="w-4 h-4 bg-white rounded-full mx-auto mb-4 blur-[1px] animate-pulse" />
-              <p className="text-gray-400 text-[11px] font-black uppercase leading-relaxed tracking-widest">
-                 [Visual Node 6.2: High-resolution catchlight analysis at f/1.4]
-              </p>
-           </div>
-        </div>
-      </div>
-    </div>
-
-    {/* SECTION 2: MELANIN & THE GLOW PROTOCOL */}
-    <div className="bg-white text-black p-16 rounded-[4.5rem] relative overflow-hidden">
-       <div className="relative z-10 space-y-12">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-8">
-             <div>
-                <div className="flex items-center gap-4 mb-4">
-                   <Palette size={32} className="text-red-600" />
-                   <span className="text-red-600 font-black text-[11px] uppercase tracking-[0.5em]">The Skin Authority</span>
-                </div>
-                <h2 className="font-embroidery text-6xl md:text-8xl italic leading-tight">THE <span className="text-red-600">GLOW</span> PROTOCOL</h2>
-             </div>
-             <p className="max-w-xl text-lg font-medium text-gray-500 leading-relaxed uppercase">
-                Global camera sensors are often calibrated for lighter skin tones, which can lead to "muddiness" or graying when shooting African subjects. A Pichazangu Pro masters <b>Spectral Reflectance</b>. 
-             </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-             <StrategyCard 
-                num="01" 
-                title="Expose for Highlights" 
-                desc="Deep melanin reflects light beautifully. Watch your 'Specular Highlights'—the shine on the forehead or cheekbones. Don't let them blow out to pure white." 
-             />
-             <StrategyCard 
-                num="02" 
-                title="Golden White Balance" 
-                desc="Avoid 'Auto' WB. Manually set your camera to 5600K or 6000K to preserve the natural warmth and rich undertones of the skin." 
-             />
-             <StrategyCard 
-                num="03" 
-                title="Large Light Sources" 
-                desc="Small lights create harsh, oily-looking reflections. Use the largest softbox possible to wrap the light around the facial structure." 
-             />
-          </div>
-       </div>
-       <div className="absolute top-0 right-0 p-20 opacity-[0.03] select-none pointer-events-none text-[35rem] font-embroidery whitespace-nowrap rotate-12">
-          MELANIN
-       </div>
-    </div>
-
-    {/* SECTION 3: THE FOUR PILLARS OF LIGHTING */}
-    <div className="space-y-16">
-       <div className="text-center space-y-6">
-          <h3 className="font-embroidery text-6xl italic text-white uppercase">THE <span className="text-red-600 font-embroidery-sketch">DIRECTOR'S</span> PATTERNS</h3>
-          <p className="text-gray-500 font-black text-xs uppercase tracking-[0.6em]">Foundational Geometry of the Face</p>
-       </div>
-
-       <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-          <LightingPatternCard 
-             title="Rembrandt Lighting" 
-             desc="Identified by the tiny triangle of light on the shadowed cheek. It is the gold standard for dramatic, editorial portraits." 
-             image="https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=800&q=80"
-          />
-          <LightingPatternCard 
-             title="Butterfly Lighting" 
-             desc="Light is placed directly above the lens. It creates a small shadow under the nose, perfect for glamour and high-end fashion." 
-             image="https://images.unsplash.com/photo-1531746020798-e7953e3e8c5c?auto=format&fit=crop&w=800&q=80"
-          />
-       </div>
-    </div>
-
-    {/* PRO TIP SECTION */}
-    <div className="p-16 bg-red-600 rounded-[4rem] text-white shadow-3xl relative overflow-hidden group">
-       <div className="relative z-10 max-w-4xl">
-          <div className="flex items-center gap-4 mb-8">
-             <Zap size={32} className="fill-current" />
-             <span className="text-xs font-black uppercase tracking-[0.5em]">The Pro Tip (RED)</span>
-          </div>
-          <h3 className="font-embroidery text-6xl md:text-8xl italic leading-none mb-10">BE THE <br/><span className="font-embroidery-sketch text-black">DIRECTOR</span>, NOT THE BUTTON.</h3>
-          <p className="text-xl md:text-2xl font-bold uppercase tracking-tight leading-relaxed mb-12">
-             Don't hide behind the camera. Lower it. Talk to your subject. Ask them about their childhood or their favorite Nairobi meal. Capture the moment <b>after</b> they finish answering—when the natural smile fades and the authentic soul remains.
-          </p>
-       </div>
-       <Users size={400} className="absolute -right-20 -bottom-20 opacity-10 rotate-12 group-hover:rotate-0 transition-transform duration-700" />
-    </div>
-
-    {/* PRACTICAL NODE: THE ONE-LIGHT CHALLENGE */}
-    <div className="space-y-12">
-       <div className="bg-white/5 border border-white/10 p-16 rounded-[4rem] relative overflow-hidden group">
-          <div className="relative z-10 max-w-4xl">
-             <div className="flex items-center gap-4 mb-10">
-                <Target size={32} className="text-red-600" />
-                <h2 className="font-embroidery text-5xl text-white italic uppercase">PRACTICAL: <span className="text-red-600">ONE LIGHT MASTERY</span></h2>
-             </div>
-             <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
-                <div className="space-y-6">
-                   <p className="text-gray-400 text-lg uppercase font-medium leading-relaxed">
-                      Confusion arises with too many lights. Mastery arises with one.
-                   </p>
-                   <div className="space-y-4">
-                      <Step num="01" text="Find a subject and a single lamp or window." />
-                      <Step num="02" text="Rotate the subject 360 degrees. Watch how the shadow 'slips' across the nose and jaw." />
-                      <Step num="03" text="Find the Rembrandt triangle. Take the shot." />
-                      <Step num="04" text="Upload to your trainee node for AI structural review." />
-                   </div>
-                </div>
-                <div className="bg-[#0a0a0a] p-10 rounded-[3rem] border border-white/5 flex flex-col justify-center text-center">
-                   <Ghost size={64} className="text-red-600 mx-auto mb-8" />
-                   <h4 className="text-2xl font-black text-white mb-4 uppercase">MASTER THE VOID</h4>
-                   <p className="text-gray-500 text-sm font-bold leading-relaxed uppercase tracking-widest">
-                      "Shadow is the only thing that gives light meaning. Learn to love the dark parts of the face."
-                   </p>
-                </div>
-             </div>
-          </div>
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+       <div className="bg-[#0a0a0a] border border-white/5 rounded-[3rem] p-10 space-y-6">
+          <h3 className="font-embroidery text-3xl italic text-white uppercase">The Director's Role</h3>
+          <p className="text-gray-400 text-sm leading-relaxed">In the studio, you are the Director. You aren't just taking a picture; you are managing the subject’s emotions.</p>
        </div>
     </div>
   </div>
@@ -432,38 +583,56 @@ const Step = ({num, text}: any) => (
   </div>
 );
 
-const LightingPatternCard = ({ title, desc, image }: { title: string, desc: string, image: string }) => (
-  <div className="bg-[#0a0a0a] border border-white/5 rounded-[3rem] overflow-hidden group hover:border-red-600/30 transition-all">
-    <div className="h-64 overflow-hidden relative">
-       <img src={image} className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700" alt={title} />
-       <div className="absolute inset-0 bg-black/20" />
-    </div>
-    <div className="p-8">
-       <h4 className="font-black text-xl text-white uppercase mb-2 tracking-tighter">{title}</h4>
-       <p className="text-gray-500 text-xs font-medium leading-relaxed uppercase tracking-tight">{desc}</p>
-    </div>
+const CircleIcon = ({size}: any) => (
+  <div className="w-6 h-6 rounded-full border-2 border-current flex items-center justify-center">
+    <div className="w-2 h-2 bg-current rounded-full" />
   </div>
 );
 
-const StrategyCard = ({ num, title, desc }: { num: string, title: string, desc: string }) => (
-  <div className="p-10 bg-white/5 border border-white/10 rounded-[3rem] hover:bg-white/10 transition-all group">
-    <span className="font-bungee text-3xl text-red-600 block mb-6">{num}</span>
-    <h4 className="text-white font-black uppercase text-xl mb-4 tracking-tighter group-hover:text-red-600 transition-colors">{title}</h4>
-    <p className="text-gray-500 text-xs font-bold leading-relaxed uppercase tracking-tight">{desc}</p>
+const LegacyFeature = ({icon, title, desc}: any) => (
+  <div className="flex gap-6 p-6 bg-white/5 rounded-3xl border border-white/5 hover:bg-white/10 transition-all group">
+     <div className="text-red-600 mt-1">{icon}</div>
+     <div>
+        <h4 className="font-black text-white uppercase text-sm mb-2">{title}</h4>
+        <p className="text-[10px] text-gray-500 font-bold uppercase leading-relaxed">{desc}</p>
+     </div>
   </div>
 );
 
-const TableRow = ({icon, label, legacy, modern}: {icon: any, label: string, legacy: string, modern: string}) => (
-   <tr className="border-b border-white/5 hover:bg-white/5 transition-all group">
-      <td className="p-6">
-         <div className="flex items-center gap-3">
-            <div className="text-red-600 opacity-50 group-hover:opacity-100">{icon}</div>
-            <span className="font-black text-white">{label}</span>
-         </div>
-      </td>
-      <td className="p-6 text-gray-500">{legacy}</td>
-      <td className="p-6 text-white">{modern}</td>
-   </tr>
+const ModernFeatureCard = ({icon, title, desc}: any) => (
+  <div className="bg-gray-50 border border-gray-100 p-10 rounded-[3rem] hover:bg-white hover:shadow-2xl transition-all group">
+     <div className="text-red-600 mb-8 group-hover:scale-110 transition-transform duration-500">{React.cloneElement(icon as React.ReactElement, { size: 36 })}</div>
+     <h4 className="font-black text-gray-900 uppercase text-xl mb-4 tracking-tighter">{title}</h4>
+     <p className="text-gray-500 text-xs font-bold leading-relaxed uppercase tracking-tight">{desc}</p>
+  </div>
+);
+
+const GripPoint = ({num, title, desc}: any) => (
+  <div className="flex gap-6 items-start group">
+     <span className="font-bungee text-2xl text-red-600 transition-transform group-hover:scale-110">{num}</span>
+     <div>
+        <h4 className="font-black text-white uppercase text-sm mb-2 tracking-widest">{title}</h4>
+        <p className="text-xs text-gray-500 font-bold uppercase leading-relaxed">{desc}</p>
+     </div>
+  </div>
+);
+
+const MenuNode = ({icon, title, desc}: any) => (
+  <div className="p-8 bg-gray-50 rounded-[2.5rem] border border-gray-100 group hover:bg-white hover:shadow-xl transition-all">
+     <div className="text-red-600 mb-6">{React.cloneElement(icon as React.ReactElement, { size: 28 })}</div>
+     <h4 className="font-black text-gray-900 uppercase text-sm mb-3 tracking-widest">{title}</h4>
+     <p className="text-[10px] text-gray-500 font-bold leading-relaxed uppercase tracking-tight">{desc}</p>
+  </div>
+);
+
+const ChecklistItem = ({num, title, desc}: any) => (
+  <div className="flex gap-6 group">
+     <div className="w-10 h-10 rounded-xl bg-red-600/10 text-red-600 flex items-center justify-center font-bungee text-sm shrink-0">{num}</div>
+     <div>
+        <h4 className="font-black text-white uppercase text-sm mb-1 tracking-widest group-hover:text-red-600 transition-colors">{title}</h4>
+        <p className="text-[10px] text-gray-500 font-bold uppercase leading-relaxed">{desc}</p>
+     </div>
+  </div>
 );
 
 export default Learn;
