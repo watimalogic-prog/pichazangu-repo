@@ -95,8 +95,6 @@ export interface Photo {
   discountedPrice?: number;
 }
 
-// DO add comment above each fix.
-// Added missing VaultCollection interface used for gallery categorization.
 export interface VaultCollection {
   id: string;
   name: string;
@@ -120,9 +118,7 @@ export interface Vault {
   archiveStatus: 'Active' | 'Archived' | 'Permanent';
   eventName?: string;
   description?: string;
-  price?: number; // Total bundle price
-  // DO add comment above each fix.
-  // Updated status union to include 'preview' to fix type mismatch in mock data.
+  price?: number; 
   status?: 'locked' | 'unlocked' | 'paid' | 'preview';
 }
 
@@ -233,8 +229,9 @@ export interface CastingCall {
 export interface Milestone {
   id: string;
   label: string;
-  amount: number;
-  status: 'Pending' | 'Released';
+  amount?: number;
+  status: 'Locked' | 'Active' | 'Completed';
+  description: string;
 }
 
 export interface Gig {
@@ -273,16 +270,19 @@ export interface Bid {
 export interface Lesson {
   id: string;
   title: string;
-  duration: string;
-  videoUrl: string;
-  type: 'video' | 'quiz' | 'practical';
+  duration?: string;
+  videoUrl?: string;
+  type: 'video' | 'quiz' | 'practical' | 'reading';
   isCompleted: boolean;
+  milestoneId?: string;
+  proTip?: string;
 }
 
-export interface Module {
+export interface CourseModule {
   id: string;
   title: string;
   lessons: Lesson[];
+  month?: number;
 }
 
 export interface AcademyCourse {
@@ -291,7 +291,8 @@ export interface AcademyCourse {
   title: string;
   description: string;
   durationMonths: number;
-  modules: Module[];
+  modules: CourseModule[];
+  milestones: Milestone[];
   progress: number;
   isUnlocked: boolean;
 }

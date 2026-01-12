@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { Photo, CartItem, UserRole, UserProfile } from '../types';
+import { Photo, CartItem, UserRole, UserProfile, Vault } from '../types';
 
 /**
  * THEME STORE
@@ -19,6 +19,66 @@ export const useThemeStore = create<ThemeStore>()(
       })),
     }),
     { name: 'pichazangu-theme' }
+  )
+);
+
+/**
+ * VAULT STORE
+ * Persists created vaults so they can be searched by clients.
+ */
+interface VaultStore {
+  vaults: Vault[];
+  addVault: (vault: Vault) => void;
+  updateVaultPhotoCount: (id: string, count: number) => void;
+}
+
+export const useVaultStore = create<VaultStore>()(
+  persist(
+    (set) => ({
+      vaults: [
+        {
+          id: 'v-private-1',
+          clientId: 'c1',
+          clientName: 'Amara Okafor',
+          clientEmail: 'amara@example.io',
+          clientPhone: '+254 712 000 111',
+          clientAvatar: 'https://i.pravatar.cc/150?u=amara',
+          photographerId: 'ph1',
+          photographerName: 'Ali Command',
+          passkey: '882910',
+          photoCount: 42,
+          lastUpdated: '2024-05-21',
+          isPublic: false,
+          archiveStatus: 'Active',
+          eventName: 'Nairobi Fashion Gala',
+          price: 25000,
+          status: 'locked'
+        },
+        {
+          id: 'v-public-1',
+          clientId: 'system',
+          clientName: 'Global Market',
+          clientEmail: '',
+          clientPhone: '',
+          clientAvatar: 'https://images.unsplash.com/photo-1547471080-7cc2caa01a7e?auto=format&fit=crop&w=100&q=80',
+          photographerId: 'ph1',
+          photographerName: 'Ali Command',
+          passkey: '',
+          photoCount: 890,
+          lastUpdated: '2024-05-22',
+          isPublic: true,
+          archiveStatus: 'Active',
+          eventName: 'Wildlife Sector',
+          price: 1500,
+          status: 'preview'
+        }
+      ],
+      addVault: (vault) => set((state) => ({ vaults: [vault, ...state.vaults] })),
+      updateVaultPhotoCount: (id, count) => set((state) => ({
+        vaults: state.vaults.map(v => v.id === id ? { ...v, photoCount: v.photoCount + count } : v)
+      })),
+    }),
+    { name: 'pichazangu-vaults' }
   )
 );
 
