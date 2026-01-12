@@ -8,7 +8,7 @@ import {
   Search, Bookmark, Share2, History, Compass, BrainCircuit,
   Volume2, Fingerprint, Crosshair, Hand, Smile, Box, Timer, Leaf,
   Image as ImageIcon, HelpCircle, Activity, ShieldCheck,
-  Settings
+  Settings, Layers, Cpu, Database, Eye, ZapOff, FlaskConical, Binary, Microscope
 } from 'lucide-react';
 import { MOCK_ACADEMY_COURSES } from '../constants';
 import { AcademyCourse, Lesson } from '../types';
@@ -242,148 +242,229 @@ const ModuleOneContent = () => (
 );
 
 const ModuleTwoContent = () => (
-  <div className="space-y-16 pb-32">
-    <div className="space-y-6">
-      <h2 className="text-5xl font-black uppercase tracking-tighter text-white">I. From Chemistry to Silicon: The Great Shift</h2>
-      <p className="text-xl leading-relaxed text-gray-400 uppercase font-medium">
-        To understand the modern professional rig, you must understand that every button on a Nikon Z9 or a Canon R3 is a digital ghost of a mechanical ancestor. For a hundred years, photography was a matter of chemistry. Light hit silver-halide crystals on a strip of plastic (film), creating a latent image that had to be "developed" in a darkroom with toxic liquids. 
-      </p>
-      <p className="text-xl leading-relaxed text-gray-400 uppercase font-medium">
-        Today, silicon has replaced silver. The image sensor is a grid of millions of microscopic light-sensitive "wells" that convert photons into electrical signals. This transition from the mechanical age to the computational age has completely changed the "barrier to entry" for photographers in East Africa. You no longer need to import expensive rolls of Kodak film from abroad; you only need light and a memory card.
-      </p>
-    </div>
-
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-       <div className="bg-[#0a0a0a] border border-white/5 rounded-[3.5rem] p-12 space-y-8 relative overflow-hidden group">
-          <div className="relative z-10">
-             <div className="flex items-center gap-4 mb-8">
-                <div className="w-14 h-14 bg-red-600 rounded-2xl flex items-center justify-center shadow-[0_0_20px_rgba(255,0,0,0.3)]">
-                   <Activity size={32} />
-                </div>
-                <h3 className="font-embroidery text-4xl italic text-white uppercase">The DSLR Era: The Mirror Slap</h3>
-             </div>
-             <p className="text-gray-400 text-lg leading-relaxed mb-6">
-                For the last 20 years, the Digital Single Lens Reflex (DSLR) has been the king of the newsroom. Inside, a physical mirror sits at a 45-degree angle. When you look through the viewfinder, you are seeing the actual light coming through the lens, reflected up into your eye via a pentaprism.
-             </p>
-             <p className="text-gray-400 text-lg leading-relaxed font-bold border-l-4 border-red-600 pl-6">
-                The "Slap": When you press the shutter, that mirror must physically flip up out of the way so light can hit the sensor. That "clack-clack" sound is the heartbeat of a DSLR. It’s rugged, mechanical, and reliable in the dusty streets of CBD.
-             </p>
-          </div>
-       </div>
-
-       <div className="bg-white/5 border border-white/10 rounded-[3.5rem] p-12 space-y-8 flex flex-col justify-center relative group overflow-hidden">
-          <div className="relative z-10">
-             <div className="flex items-center gap-4 mb-8">
-                <div className="w-14 h-14 bg-white text-black rounded-2xl flex items-center justify-center">
-                   <Zap size={32} />
-                </div>
-                <h3 className="font-embroidery text-4xl italic text-white uppercase">The Mirrorless Revolution</h3>
-             </div>
-             <p className="text-gray-400 text-lg leading-relaxed">
-                Modern Pichazangu Pros are moving to Mirrorless. There is no physical mirror. The light hits the sensor directly and is projected onto a tiny TV screen inside the viewfinder (the EVF). 
-             </p>
-             <div className="grid grid-cols-2 gap-4 mt-8">
-                <div className="p-4 bg-black/40 rounded-2xl border border-white/5">
-                   <span className="text-[10px] font-black text-red-600 uppercase block mb-1">Benefit A</span>
-                   <span className="text-xs font-bold text-white uppercase tracking-tight">Silent Shutter for sensitive events (Weddings).</span>
-                </div>
-                <div className="p-4 bg-black/40 rounded-2xl border border-white/5">
-                   <span className="text-[10px] font-black text-red-600 uppercase block mb-1">Benefit B</span>
-                   <span className="text-xs font-bold text-white uppercase tracking-tight">What You See Is What You Get (Exposure Preview).</span>
-                </div>
-             </div>
-          </div>
-          <Zap size={300} className="absolute -right-20 -bottom-20 opacity-[0.02] -rotate-12 group-hover:rotate-0 transition-transform duration-1000" />
-       </div>
-    </div>
-
-    <div className="space-y-12">
-       <h3 className="text-3xl font-black uppercase text-white border-b border-white/10 pb-6">II. Anatomy of the Modern Pro Rig</h3>
-       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          <HardwareNode 
-             icon={<Crosshair/>}
-             title="The Optics (Lens)"
-             desc="The lens is more important than the camera. In East Africa, we recommend starting with a 'Nifty Fifty' (50mm f/1.8). It is sharp, cheap, and mimics the human eye."
-          />
-          <HardwareNode 
-             icon={<BrainCircuit/>}
-             title="The Image Sensor"
-             desc="The 'Bucket' analogy: A Full Frame sensor has bigger buckets than an APS-C (Crop) sensor. Bigger buckets catch more light, meaning cleaner photos at night."
-          />
-          <HardwareNode 
-             icon={<HardDrive/>}
-             title="Storage Nodes"
-             desc="Always use high-speed SD cards (UHS-II). A slow card will 'choke' your camera when shooting burst mode at a football match in Nyayo Stadium."
-          />
-       </div>
-    </div>
-
-    <div className="p-16 bg-red-600 rounded-[4rem] text-white shadow-3xl relative overflow-hidden group">
-       <div className="relative z-10 max-w-3xl">
-          <div className="flex items-center gap-4 mb-8">
-             <Star size={32} className="fill-current" />
-             <span className="text-xs font-black uppercase tracking-[0.5em]">The Command Center Protocol</span>
-          </div>
-          <h3 className="font-embroidery text-6xl md:text-8xl italic leading-none mb-10">NEVER BUY <br/><span className="font-embroidery-sketch">NEW GEAR</span> FIRST.</h3>
-          <p className="text-xl md:text-2xl font-bold uppercase tracking-tight leading-relaxed mb-12">
-             The biggest amateur mistake is thinking a 400,000 KES camera makes you a pro. An entry-level body from 2018 with a professional lens will outperform a 2024 body with a 'kit' lens every single time. Master the light before you master the catalog.
-          </p>
-          <div className="flex gap-4">
-             <div className="px-6 py-3 bg-black/20 rounded-xl border border-white/30 text-[10px] font-black uppercase tracking-widest">Rule #1: Optics Over Body</div>
-             <div className="px-6 py-3 bg-black/20 rounded-xl border border-white/30 text-[10px] font-black uppercase tracking-widest">Rule #2: Buy Used, Shoot More</div>
-          </div>
-       </div>
-       <Trophy size={400} className="absolute -right-20 -bottom-20 opacity-10 rotate-12 group-hover:rotate-0 transition-transform duration-700" />
-    </div>
-
-    <div className="space-y-10 py-10">
-       <div className="flex items-center gap-4 text-gray-500"><Layout size={24} /><span className="text-xs font-black uppercase tracking-[0.4em]">Hardware Reference Node</span></div>
-       <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
-          <div className="space-y-6">
-             <div className="aspect-[16/9] bg-[#111] rounded-[3rem] border border-white/10 flex items-center justify-center group overflow-hidden relative">
-                <div className="absolute inset-0 bg-gradient-to-br from-red-600/10 to-transparent" />
-                <p className="text-gray-600 text-[11px] font-black uppercase text-center px-12 leading-relaxed relative z-10">
-                   [Diagram 2.3: Mechanical Cross-section of a DSLR showing the 45-degree mirror and the Pentaprism housing.]
-                </p>
-             </div>
-             <div className="px-4">
-                <h4 className="text-white font-bold uppercase text-sm mb-2 tracking-tight">The Optical Path</h4>
-                <p className="text-gray-500 text-xs leading-relaxed uppercase">Notice the complexity. More moving parts means more chances for mechanical failure in humid or sandy environments.</p>
-             </div>
-          </div>
-          <div className="space-y-6">
-             <div className="aspect-[16/9] bg-[#111] rounded-[3rem] border border-white/10 flex items-center justify-center group overflow-hidden relative">
-                <div className="absolute inset-0 bg-gradient-to-br from-violet-600/10 to-transparent" />
-                <p className="text-gray-600 text-[11px] font-black uppercase text-center px-12 leading-relaxed relative z-10">
-                   [Visual 2.4: Mirrorless Mount Comparison. Showing the shorter 'Flange Distance' which allows for sharper wide-angle optics.]
-                </p>
-             </div>
-             <div className="px-4">
-                <h4 className="text-white font-bold uppercase text-sm mb-2 tracking-tight">The Computational Future</h4>
-                <p className="text-gray-500 text-xs leading-relaxed uppercase">By removing the mirror, engineers can place the glass closer to the sensor, resulting in unmatched corner-to-corner sharpness.</p>
-             </div>
-          </div>
-       </div>
-    </div>
-
+  <div className="space-y-24 pb-40">
+    {/* HERO SECTION: THE ALCHEMY OF GEAR */}
     <div className="space-y-10">
-       <h3 className="text-3xl font-black uppercase text-white">III. Student Protocol: The Tactile Discovery</h3>
-       <p className="text-gray-400 text-lg max-w-2xl font-medium leading-relaxed uppercase">
-          In professional photography, things happen fast. If you have to look down at your camera to find the ISO button while a lion is lunging or a bride is walking down the aisle, you have already lost the shot. 
-       </p>
-       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <Step num="01" text="Pick up your camera. Close your eyes and identify the main dial (usually near your right index finger)." />
-          <Step num="02" text="Still with eyes closed, locate the shutter button. Feel the 'half-press' vs 'full-press' depth." />
-          <Step num="03" text="Find the lens release button. Practice changing a lens in the dark. In our region, we do this often under 'Matatu' or stadium lighting." />
-          <Step num="04" text="Turn on your camera. Practice switching from Auto to Manual mode using only your thumb, without looking at the dial." />
+      <div className="relative h-[600px] rounded-[4.5rem] overflow-hidden group shadow-2xl border border-white/5">
+        <img src="https://images.unsplash.com/photo-1542038784456-1ea8e935640e?auto=format&fit=crop&w=1600&q=80" className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-1000 group-hover:scale-105" alt="Vintage Camera Hardware" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent" />
+        <div className="absolute bottom-16 left-16 right-16">
+          <div className="flex items-center gap-4 mb-6">
+            <FlaskConical size={32} className="text-red-600" />
+            <span className="text-xs font-black text-red-600 uppercase tracking-[0.5em]">Hardware Node 02.1</span>
+          </div>
+          <h2 className="font-embroidery text-7xl md:text-9xl text-white italic leading-none">THE ALCHEMY OF <br/> <span className="font-embroidery-sketch">THE MACHINE</span></h2>
+        </div>
+      </div>
+
+      <div className="prose prose-invert max-w-none space-y-10">
+        <p className="text-2xl text-gray-400 font-medium leading-relaxed uppercase tracking-tight">
+          To master the digital marketplace of Pichazangu, you must first understand that your modern camera is a computational miracle born from a century of chemical alchemy. Before the first digital sensor was ever conceived in a lab, photography was a matter of physical sacrifice. Photographers carried heavy glass plates, toxic silver-nitrate baths, and waited hours for a single exposure.
+        </p>
+        <p className="text-xl text-gray-400 leading-relaxed uppercase">
+          In East Africa, the first "Media Nodes" were mobile darkrooms—tents set up in the savannah or the city square. Understanding how light transitions from a physical photon to a digital bit is the difference between a "snap-taker" and a "Visual Architect." In this module, we bridge the gap between the chemical past and the silicon future.
+        </p>
+      </div>
+    </div>
+
+    {/* SECTION 1: THE SILICON REVOLUTION */}
+    <div className="grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
+      <div className="space-y-10">
+        <div className="flex items-center gap-4">
+           <div className="w-16 h-16 bg-red-600 rounded-[2rem] flex items-center justify-center shadow-[0_0_40px_rgba(227,30,36,0.4)]">
+              <Microscope size={36} />
+           </div>
+           <h3 className="font-embroidery text-5xl italic text-white uppercase">The Digital Retina</h3>
+        </div>
+        <div className="space-y-8">
+           <p className="text-gray-400 text-lg leading-relaxed font-medium uppercase">
+              The heart of your modern camera is the <b>Image Sensor</b>. Imagine a vast, microscopic grid of millions of tiny "buckets." When you press the shutter, you open the "gate" and let photons (particles of light) rain down into these buckets.
+           </p>
+           <div className="bg-white/5 border border-white/10 p-10 rounded-[3.5rem] relative overflow-hidden group">
+              <Binary size={24} className="text-red-600 mb-6" />
+              <h4 className="text-sm font-black text-white uppercase tracking-widest mb-4">The Photon-to-Bit Pipeline</h4>
+              <p className="text-xs text-gray-500 uppercase font-bold leading-relaxed">
+                1. Photons hit the Photodiode (Bucket).<br/>
+                2. Light is converted into an electrical charge.<br/>
+                3. The Processor maps the intensity to a numeric value (0-255).<br/>
+                4. A RAW file is generated, capturing the pure mathematical soul of the light.
+              </p>
+           </div>
+           <p className="text-gray-400 text-lg leading-relaxed font-medium uppercase">
+              In the regional market, where the noon sun is harsh and the shadows are deep, understanding the "Quantum Efficiency" of your sensor allows you to preserve details that others lose. You aren't just taking a picture; you are collecting data points.
+           </p>
+        </div>
+      </div>
+      <div className="space-y-6">
+        <div className="aspect-[4/5] rounded-[4rem] overflow-hidden border border-white/10 shadow-2xl relative group">
+           <img src="https://images.unsplash.com/photo-1516035069371-29a1b244cc32?auto=format&fit=crop&w=1200&q=80" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000" alt="Sensor Close-up" />
+           <div className="absolute inset-0 bg-black/40" />
+           <div className="absolute inset-0 flex items-center justify-center">
+              <div className="w-32 h-32 border-2 border-red-600 rounded-full animate-ping opacity-20" />
+           </div>
+        </div>
+        <p className="text-[11px] font-black text-gray-600 uppercase tracking-[0.5em] text-center">[Visual Node 2.2: Computational mapping of a Full-Frame CMOS Sensor]</p>
+      </div>
+    </div>
+
+    {/* SECTION 2: DSLR VS MIRRORLESS - THE MECHANICAL DEBATE */}
+    <div className="space-y-16">
+       <div className="text-center space-y-6">
+          <h3 className="font-embroidery text-6xl italic text-white uppercase">THE EVOLUTION OF <span className="text-red-600 font-embroidery-sketch">THE VIEW</span></h3>
+          <p className="text-gray-500 font-black text-xs uppercase tracking-[0.6em]">Two Philosophies of Sight</p>
        </div>
-       <div className="mt-12 bg-[#0a0a0a] border border-white/5 p-10 rounded-[3rem] flex items-center gap-10">
-          <Fingerprint size={64} className="text-red-600 shrink-0" />
-          <div>
-             <h4 className="text-white font-black uppercase tracking-widest text-lg mb-2">Build Muscle Memory</h4>
-             <p className="text-gray-500 text-sm font-medium uppercase leading-relaxed">
-                Your camera should be an extension of your nervous system. Module 2 ends when you can change your Aperture and Shutter speed while carrying a conversation with a client.
+
+       <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+          {/* DSLR PANEL */}
+          <div className="bg-[#0a0a0a] border border-white/5 rounded-[4rem] p-12 space-y-10 group hover:border-red-600/30 transition-all">
+             <div className="flex items-center justify-between">
+                <div className="w-14 h-14 bg-white/5 rounded-2xl flex items-center justify-center text-red-600 border border-white/10">
+                   <Activity size={28} />
+                </div>
+                <span className="text-[10px] font-black text-gray-600 uppercase tracking-widest">Heritage Mechanism</span>
+             </div>
+             <div>
+                <h4 className="font-embroidery text-4xl text-white italic mb-6">DSLR: THE ANALOG ECHO</h4>
+                <p className="text-gray-500 text-sm leading-relaxed font-medium uppercase">
+                   The Digital Single Lens Reflex is a beast of physics. It uses a <b>physical mirror</b> sitting at a 45-degree angle. When you look through the glass, you are seeing real, bouncing photons. 
+                </p>
+             </div>
+             <div className="space-y-4">
+                <div className="flex items-start gap-4">
+                   <Zap size={16} className="text-red-600 shrink-0 mt-1" />
+                   <p className="text-xs text-gray-400 font-bold uppercase">Battery Dominance: Mechanical viewfinders consume zero power.</p>
+                </div>
+                <div className="flex items-start gap-4">
+                   <Zap size={16} className="text-red-600 shrink-0 mt-1" />
+                   <p className="text-xs text-gray-400 font-bold uppercase">Tactile Feedback: The "Mirror Slap" provides physical confirmation of the capture.</p>
+                </div>
+             </div>
+             <div className="pt-10 border-t border-white/5">
+                <p className="text-[10px] text-gray-600 font-black uppercase italic">Best for: Rugged field work, long wildlife dispatches, journalism.</p>
+             </div>
+          </div>
+
+          {/* MIRRORLESS PANEL */}
+          <div className="bg-red-600 rounded-[4rem] p-12 space-y-10 group shadow-2xl shadow-red-900/40 relative overflow-hidden">
+             <div className="relative z-10">
+               <div className="flex items-center justify-between">
+                  <div className="w-14 h-14 bg-black/20 rounded-2xl flex items-center justify-center text-white border border-white/20">
+                     <Cpu size={28} />
+                  </div>
+                  <span className="text-[10px] font-black text-red-100 uppercase tracking-widest">Computational Logic</span>
+               </div>
+               <div>
+                  <h4 className="font-embroidery text-4xl text-white italic mb-6">MIRRORLESS: THE SENSOR-DIRECT</h4>
+                  <p className="text-red-100 text-sm leading-relaxed font-medium uppercase">
+                     Mirrorless systems remove the glass barrier. Light hits the sensor directly and is projected onto a 120Hz micro-display inside the viewfinder. What you see is exactly what the file will look like.
+                  </p>
+               </div>
+               <div className="space-y-4">
+                  <div className="flex items-start gap-4">
+                     <CheckCircle2 size={16} className="text-white shrink-0 mt-1" />
+                     <p className="text-xs text-white font-bold uppercase">Exposure Preview: See the final brightness before you press the button.</p>
+                  </div>
+                  <div className="flex items-start gap-4">
+                     <CheckCircle2 size={16} className="text-white shrink-0 mt-1" />
+                     <p className="text-xs text-white font-bold uppercase">Silent Shutter: Perfect for intimate weddings and quiet studio sessions.</p>
+                  </div>
+               </div>
+             </div>
+             <Cpu size={300} className="absolute -right-20 -bottom-20 opacity-10 -rotate-12 pointer-events-none" />
+          </div>
+       </div>
+    </div>
+
+    {/* SECTION 3: THE GLASS (OPTICS) */}
+    <div className="bg-white text-black p-16 rounded-[4.5rem] relative overflow-hidden">
+       <div className="relative z-10 flex flex-col lg:flex-row items-center gap-20">
+          <div className="max-w-2xl space-y-8">
+             <div className="flex items-center gap-4">
+                <Eye size={32} className="text-red-600" />
+                <span className="text-red-600 font-black text-[11px] uppercase tracking-[0.5em]">The Lens Authority</span>
+             </div>
+             <h2 className="font-embroidery text-6xl md:text-8xl italic leading-tight">INVEST IN <br/><span className="font-embroidery-sketch">THE GLASS</span>, NOT THE BODY.</h2>
+             <p className="text-xl font-medium text-gray-500 leading-relaxed uppercase">
+                The most expensive sensor in the world is useless if the light is being bent by cheap plastic optics. For the Pichazangu marketplace, <b>Sharpness</b> is your primary currency. 
              </p>
+             <p className="text-lg font-medium text-gray-400 leading-relaxed uppercase">
+                In East Africa, we deal with intense humidity in Mombasa and fine dust in Turkana. Your "Mount" must be robust. We recommend the "Prime Hierarchy": Start with a 50mm, master the light, and only then move to specialized zooms. Lenses retain 90% of their value over a decade; camera bodies lose 50% in two years.
+             </p>
+             <button className="bg-black text-white font-black px-12 py-5 rounded-[2rem] text-[10px] uppercase tracking-widest shadow-2xl hover:bg-red-600 transition-all flex items-center gap-3">
+                <Layout size={18} /> View Regional Lens Guide
+             </button>
+          </div>
+          <div className="grid grid-cols-2 gap-4">
+             <div className="aspect-[3/4] bg-gray-100 rounded-3xl overflow-hidden border border-gray-200 group">
+                <img src="https://images.unsplash.com/photo-1616423641454-da90637cc8e7?auto=format&fit=crop&w=800&q=80" className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700" alt="Lens Elements" />
+             </div>
+             <div className="aspect-[3/4] bg-gray-100 rounded-3xl overflow-hidden border border-gray-200 group mt-12">
+                <img src="https://images.unsplash.com/photo-1542038784456-1ea8e935640e?auto=format&fit=crop&w=800&q=80" className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700" alt="Vintage Lens" />
+             </div>
+          </div>
+       </div>
+       <div className="absolute top-0 right-0 p-20 opacity-[0.03] select-none pointer-events-none text-[35rem] font-embroidery whitespace-nowrap rotate-12">
+          OPTIC
+       </div>
+    </div>
+
+    {/* SECTION 4: THE REGIONAL STRATEGY */}
+    <div className="space-y-12">
+       <div className="flex items-center gap-4">
+          <Globe className="text-red-600" size={32} />
+          <h3 className="font-embroidery text-5xl italic text-white uppercase">THE MARKET <span className="text-red-600">STRATEGY</span></h3>
+       </div>
+       
+       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <StrategyCard 
+             num="01" 
+             title="Buy Used" 
+             desc="In Nairobi and Kampala, vibrant used gear markets (like the 'Nikon Tribe' groups) allow you to access pro bodies for 30% of the retail price. Use the savings for storage." 
+          />
+          <StrategyCard 
+             num="02" 
+             title="Redundancy" 
+             desc="One camera is zero cameras. A Pichazangu Pro always has a backup body, even if it is an older model. Mechanical failure is a career-ender." 
+          />
+          <StrategyCard 
+             num="03" 
+             title="Neural Backup" 
+             desc="Don't just trust your SD cards. Implement a workflow where files are synced to a secure local node as soon as the session ends." 
+          />
+       </div>
+    </div>
+
+    {/* PRACTICAL NODE: THE GEAR AUDIT */}
+    <div className="space-y-12">
+       <div className="bg-red-600/5 border border-red-600/20 p-16 rounded-[4rem] relative overflow-hidden group">
+          <div className="relative z-10 max-w-4xl">
+             <div className="flex items-center gap-4 mb-10">
+                <Target size={32} className="text-red-600 animate-pulse" />
+                <h2 className="font-embroidery text-5xl text-white italic">MODULE 2: <span className="text-red-600">THE GEAR AUDIT</span></h2>
+             </div>
+             <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
+                <div className="space-y-6">
+                   <p className="text-gray-400 text-lg uppercase font-medium leading-relaxed">
+                      Your final challenge for Module 2 is the <b>Tactile Identification Test</b>. Completion of this node is mandatory to unlock the Exposure Triangle in Module 3.
+                   </p>
+                   <div className="space-y-4">
+                      <Step num="01" text="Remove your lens. Identify the sensor type (Full Frame, APS-C, or Micro 4/3)." />
+                      <Step num="02" text="Locate your SD/CFexpress card slot. Check the 'Write Speed' rating on your card." />
+                      <Step num="03" text="Find the 'Diopter' wheel next to your viewfinder. Adjust it until the numeric grid is sharp for YOUR eyes." />
+                      <Step num="04" text="Identify every custom (Fn) button on your body. Map one to 'Eye-Tracking' and another to 'ISO'." />
+                   </div>
+                </div>
+                <div className="bg-black/60 backdrop-blur-md p-10 rounded-[3rem] border border-white/5 flex flex-col justify-center text-center">
+                   <ZapOff size={64} className="text-red-600 mx-auto mb-8" />
+                   <h4 className="text-2xl font-black text-white mb-4 uppercase">SHUT DOWN THE SCREEN</h4>
+                   <p className="text-gray-500 text-sm font-bold leading-relaxed uppercase tracking-widest">
+                      "If you cannot change your lens and check your battery levels in total darkness, you are not ready for the street. Mastery of the hardware is mastery of the moment."
+                   </p>
+                </div>
+             </div>
+          </div>
+          <div className="absolute top-0 right-0 p-10 opacity-5 -rotate-12 translate-x-12 translate-y-12 group-hover:rotate-0 transition-transform">
+             <HardDrive size={300} />
           </div>
        </div>
     </div>
@@ -391,99 +472,171 @@ const ModuleTwoContent = () => (
 );
 
 const ModuleThreeContent = () => (
-  <div className="space-y-12 pb-20">
-    <div className="space-y-6">
-      <h2 className="text-4xl font-black uppercase tracking-tighter text-white">I. The Legacy of the Mechanical Age</h2>
-      <p className="text-lg leading-relaxed text-gray-400 uppercase">
-        To master a modern camera, you must respect its ancestors. Every digital setting you see today is a digital simulation of a physical, mechanical process from the 20th century. In the "Old World," features were tactile. To change your "ISO" (sensitivity), you had to physically open the back of the camera and swap the roll of film. To change your shutter speed, you turned a heavy metal dial that wound a spring.
-      </p>
-      <p className="text-lg leading-relaxed text-gray-400 uppercase">
-        In East Africa, many of our legendary photojournalists started on these mechanical beasts. They learned the "feel" of the camera. As a Pichazangu student, understanding these features helps you troubleshoot. When your digital camera fails to focus, knowing how a manual "Rangefinder" worked helps you understand how to fix it yourself.
-      </p>
-    </div>
-
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-       <div className="bg-[#0a0a0a] border border-white/5 rounded-[3.5rem] p-10 space-y-8 relative overflow-hidden group">
-          <div className="relative z-10">
-             <div className="flex items-center gap-3 mb-6">
-                <History size={24} className="text-red-600" />
-                <span className="text-[10px] font-black text-gray-500 uppercase tracking-widest">Key Features Comparison</span>
-             </div>
-             <div className="space-y-6">
-                <div>
-                   <h4 className="font-bold text-white uppercase text-sm mb-2">The Aperture Ring</h4>
-                   <p className="text-gray-400 text-xs leading-relaxed uppercase">On old lenses, you twisted a ring on the lens itself to open the "blades." Today, most cameras control this via a thumbwheel on the body.</p>
-                </div>
-                <div>
-                   <h4 className="font-bold text-white uppercase text-sm mb-2">The ISO/ASA Dial</h4>
-                   <p className="text-gray-400 text-xs leading-relaxed uppercase">Previously fixed by the film type (e.g., Kodak 400). Modern cameras have "Auto-ISO," allowing instant adjustment from bright sun to dim locker rooms.</p>
-                </div>
-                <div>
-                   <h4 className="font-bold text-white uppercase text-sm mb-2">The Film Advance Lever</h4>
-                   <p className="text-gray-400 text-xs leading-relaxed uppercase">That satisfying "crank" sound after every shot. Today, we have "Burst Mode," taking 30 photos in a single second.</p>
-                </div>
-             </div>
-          </div>
-       </div>
-
-       <div className="bg-white/5 border border-white/10 rounded-[3.5rem] p-10 space-y-8 flex flex-col justify-center">
+  <div className="space-y-20 pb-32">
+    {/* SECTION 1: THE TACTILE GHOST */}
+    <div className="space-y-10">
+      <div className="relative h-[500px] rounded-[4rem] overflow-hidden group shadow-2xl border border-white/5">
+        <img src="https://images.unsplash.com/photo-1516035069371-29a1b244cc32?auto=format&fit=crop&w=1600&q=80" className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-1000 group-hover:scale-105" alt="Vintage Camera Mechanism" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent" />
+        <div className="absolute bottom-12 left-12 right-12">
           <div className="flex items-center gap-3 mb-4">
-             <BrainCircuit size={24} className="text-red-600" />
-             <span className="text-[10px] font-black text-gray-500 uppercase tracking-widest">Modern Features: The Digital Brain</span>
+            <History size={24} className="text-red-600" />
+            <span className="text-[10px] font-black text-red-600 uppercase tracking-widest">Heritage Node 03.1</span>
           </div>
-          <ul className="space-y-6">
-             <li className="flex gap-4">
-                <div className="w-1.5 h-1.5 bg-red-600 rounded-full mt-1.5 shrink-0" />
-                <p className="text-xs text-gray-400 font-bold uppercase tracking-tight leading-snug"><b>IBIS:</b> In-Body Image Stabilization. A floating sensor that cancels tremors for sharp shots in low light.</p>
-             </li>
-             <li className="flex gap-4">
-                <div className="w-1.5 h-1.5 bg-red-600 rounded-full mt-1.5 shrink-0" />
-                <p className="text-xs text-gray-400 font-bold uppercase tracking-tight leading-snug"><b>Eye-Tracking AF:</b> AI identifying the eye of a lion or a bride to keep them sharp during motion.</p>
-             </li>
-             <li className="flex gap-4">
-                <div className="w-1.5 h-1.5 bg-red-600 rounded-full mt-1.5 shrink-0" />
-                <p className="text-xs text-gray-400 font-bold uppercase tracking-tight leading-snug"><b>Histogram:</b> A real-time digital graph showing your exposure balance before you fire.</p>
-             </li>
-          </ul>
-       </div>
-    </div>
-
-    <div className="p-12 bg-red-600 rounded-[3rem] text-white shadow-2xl relative overflow-hidden group">
-       <div className="relative z-10">
-          <div className="flex items-center gap-3 mb-4"><Zap size={24} className="fill-current" /><span className="text-[10px] font-black uppercase tracking-widest">Pro Tip (RED)</span></div>
-          <p className="text-4xl font-embroidery italic leading-snug">"Don't get distracted by 'Scene Modes' (like Portrait or Sports mode). These are for tourists. A Pichazangu Pro uses 'Aperture Priority' or 'Manual' to take full creative control."</p>
-       </div>
-    </div>
-
-    <div className="space-y-8">
-       <h3 className="text-2xl font-black uppercase text-white">Practical Experimental Tip: The Sound of Speed</h3>
-       <div className="bg-[#111] p-10 rounded-[3rem] border border-white/5 space-y-6">
-          <p className="text-gray-400 text-sm leading-relaxed uppercase font-medium">
-             Set your camera to "Shutter Priority" (S or Tv mode). Take a photo at 1/10th of a second, then take one at 1/1000th of a second. Listen to the click. The first will be a slow, "ker-thunk"; the second will be a sharp, "tick." This exercise trains your ears to recognize shutter speed without looking at the screen. Mastery of sound is the first step to shooting with your eyes on the subject, not the dials.
-          </p>
-          <div className="flex items-center gap-4 text-gray-500">
-             <Volume2 size={24} className="text-red-600" />
-             <span className="text-[10px] font-black uppercase tracking-[0.2em]">Ear Training Node Active</span>
-          </div>
-       </div>
-    </div>
-
-    <div className="pt-10 border-t border-white/5 space-y-8">
-      <h3 className="text-2xl font-black uppercase text-white">II. The Anatomy of Modern Optics</h3>
-      <p className="text-lg leading-relaxed text-gray-400 uppercase">
-        Every lens you attach to your camera is a masterpiece of physics. In the regional East African market, we often deal with high heat and dust. Understanding the "Mount" and the "Weather Sealing" is vital. Whether you shoot with a prime 50mm or a wide 24-70mm, you are controlling how photons are bent to reach your sensor.
-      </p>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-         <div className="aspect-square bg-white/5 rounded-[2.5rem] border border-white/10 flex items-center justify-center p-12 text-center group overflow-hidden">
-             <p className="text-gray-600 text-[10px] font-black uppercase leading-relaxed group-hover:scale-110 transition-transform">[Visual Node: 3.4 - Optical cross-section of a mirrorless sensor showing pixel wells and microlenses capturing high-contrast East African noon-day light.]</p>
-         </div>
-         <div className="flex flex-col justify-center space-y-6">
-            <h4 className="text-xl font-bold uppercase text-red-600">The Sensor Node</h4>
-            <p className="text-gray-400 text-xs leading-relaxed uppercase font-medium">
-               Think of your sensor as a million tiny buckets waiting for rain (photons). If you keep the bucket open too long (slow shutter), it overflows (blown highlights). If you close it too early, you get noise. Module 3 teaches you to balance the overflow vs. the drought.
-            </p>
-         </div>
+          <h2 className="font-embroidery text-6xl text-white italic leading-none">THE TACTILE GHOSTS OF THE <br/> <span className="font-embroidery-sketch">MECHANICAL AGE</span></h2>
+        </div>
       </div>
+
+      <div className="prose prose-invert max-w-none space-y-8">
+        <p className="text-xl text-gray-400 font-medium leading-relaxed uppercase tracking-tight">
+          To truly master the Pichazangu marketplace, you must understand that your mirrorless camera is not just a computer—it is a collection of mechanical ghosts. Every dial, slider, and menu item in a modern Nikon, Sony, or Canon body is a digital simulation of a physical process that photographers used for over a century. In the "Old World," there was no "Auto" mode; there were only the physical properties of light, metal, and glass.
+        </p>
+        <p className="text-lg text-gray-400 leading-relaxed uppercase">
+          In East Africa, the legendary photojournalists who captured the independence movements and the growth of our cities didn't have histograms or eye-tracking autofocus. They had a "feel" for the machine. They could change their shutter speed by the sound of the spring tension and adjust their focus by the weight of the glass. By understanding the mechanical origin of these controls, you move from being a user of technology to being a master of the physics of sight.
+        </p>
+      </div>
+    </div>
+
+    {/* SECTION 2: APERTURE - THE DIAL OF DEPTH */}
+    <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+      <div className="space-y-8">
+        <div className="flex items-center gap-4">
+           <div className="w-14 h-14 bg-red-600 rounded-2xl flex items-center justify-center shadow-[0_0_30px_rgba(255,0,0,0.4)]">
+              <Eye size={32} />
+           </div>
+           <h3 className="font-embroidery text-4xl italic text-white uppercase">Aperture: The Iris of Steel</h3>
+        </div>
+        <div className="prose prose-invert space-y-6">
+           <p className="text-gray-400 leading-relaxed font-medium uppercase">
+              Imagine the iris of your eye. When you walk into a bright Nairobi afternoon sun, your iris shrinks to protect your vision. When you step into a dimly lit jazz bar in Kampala, it dilates to catch every available photon. In photography, the <b>Aperture</b> is this physical opening.
+           </p>
+           <p className="text-gray-400 leading-relaxed font-medium uppercase">
+              Old lenses had a physical "Aperture Ring." You would twist it, and inside the lens, a series of curved metal blades would physically slide across each other. This opening (measured in f-stops) does two things: it controls the <b>Volume of Light</b> and the <b>Depth of Field</b>. A wide opening (like f/1.8) lets in massive amounts of light but makes the background "blur" into beautiful bokeh. A tiny opening (like f/16) lets in very little light but keeps everything from your toes to the horizon sharp.
+           </p>
+        </div>
+        <div className="bg-red-600/5 border border-red-600/20 p-8 rounded-[3rem] relative overflow-hidden group">
+           <Zap size={24} className="text-red-600 mb-4" />
+           <h4 className="text-sm font-black text-white uppercase tracking-widest mb-2">Red Protocol Advice</h4>
+           <p className="text-xs text-gray-500 uppercase font-bold leading-relaxed">
+             "Amateurs use f/11 for everything. Pros use f/1.8 to isolate the soul of the subject. Learn to shoot 'Wide Open' to give your Pichazangu assets that high-end editorial look."
+           </p>
+        </div>
+      </div>
+      <div className="space-y-6">
+        <div className="aspect-square rounded-[4rem] overflow-hidden border border-white/10 shadow-2xl relative group">
+           <img src="https://images.unsplash.com/photo-1616423641454-da90637cc8e7?auto=format&fit=crop&w=1200&q=80" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000" alt="Lens Aperture Blades" />
+           <div className="absolute inset-0 bg-black/20" />
+        </div>
+        <p className="text-[10px] font-black text-gray-600 uppercase tracking-[0.4em] text-center">[Visual Node 3.2: Close-up of physical aperture blades at f/2.8]</p>
+      </div>
+    </div>
+
+    {/* SECTION 3: SHUTTER SPEED - THE FREEZING OF TIME */}
+    <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+      <div className="order-2 lg:order-1 space-y-6">
+        <div className="aspect-square rounded-[4rem] overflow-hidden border border-white/10 shadow-2xl relative group">
+           <img src="https://images.unsplash.com/photo-1542038784456-1ea8e935640e?auto=format&fit=crop&w=1200&q=80" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000" alt="Shutter Mechanism" />
+           <div className="absolute inset-0 bg-black/20" />
+        </div>
+        <p className="text-[10px] font-black text-gray-600 uppercase tracking-[0.4em] text-center">[Visual Node 3.3: High-speed shutter curtain frozen at 1/8000s]</p>
+      </div>
+      <div className="order-1 lg:order-2 space-y-8">
+        <div className="flex items-center gap-4">
+           <div className="w-14 h-14 bg-red-600 rounded-2xl flex items-center justify-center shadow-[0_0_30px_rgba(255,0,0,0.4)]">
+              <Timer size={32} />
+           </div>
+           <h3 className="font-embroidery text-4xl italic text-white uppercase">Shutter: The Clockwork Gate</h3>
+        </div>
+        <div className="prose prose-invert space-y-6">
+           <p className="text-gray-400 leading-relaxed font-medium uppercase">
+              In the film days, the <b>Shutter</b> was a physical curtain made of cloth or titanium. When you pressed the button, a spring would pull this curtain across the film. The faster it moved, the less light hit the film, but the more "frozen" the action became. 
+           </p>
+           <p className="text-gray-400 leading-relaxed font-medium uppercase">
+              Today, we have electronic shutters that operate at speeds up to 1/32,000 of a second. This allows you to freeze a footballer's mid-air header at Kasarani Stadium or the splash of a Serengeti river crossing. On the other hand, a slow shutter (like 30 seconds) allows you to "paint with light," turning the headlamps of Nairobi traffic into glowing rivers of gold. Mastery of the shutter means mastery over the dimension of <b>Time</b>.
+           </p>
+        </div>
+        <div className="p-8 bg-black border-2 border-red-600 rounded-[3rem] relative overflow-hidden group">
+           <Volume2 size={24} className="text-red-600 mb-4" />
+           <h4 className="text-sm font-black text-white uppercase tracking-widest mb-2">Sonic Mastery Node</h4>
+           <p className="text-xs text-gray-500 uppercase font-bold leading-relaxed">
+             "Listen to your camera. A mechanical DSLR has a distinct 'clack'—that's the mirror and shutter dance. A mirrorless is silent. Learn to trust your eyes when the machine stops making noise."
+           </p>
+        </div>
+      </div>
+    </div>
+
+    {/* SECTION 4: ISO - THE CHEMISTRY OF THE SENSOR */}
+    <div className="bg-[#0a0a0a] border border-white/5 rounded-[4rem] p-16 space-y-12 relative overflow-hidden">
+       <div className="relative z-10 grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+          <div className="space-y-8">
+             <div className="flex items-center gap-4">
+                <div className="w-14 h-14 bg-red-600 rounded-2xl flex items-center justify-center shadow-[0_0_30px_rgba(255,0,0,0.4)]">
+                   <Zap size={32} />
+                </div>
+                <h3 className="font-embroidery text-4xl italic text-white uppercase">ISO: From Grain to Gain</h3>
+             </div>
+             <p className="text-lg text-gray-400 font-medium leading-relaxed uppercase">
+                Back in the day, if you wanted to shoot at night, you had to physically buy a different roll of film. <b>ISO 100</b> was for bright days (very fine grain); <b>ISO 1600</b> was for dark alleys (very chunky, artistic grain). Today, ISO is simply an "Amplifier" for your digital sensor.
+             </p>
+             <p className="text-lg text-gray-400 font-medium leading-relaxed uppercase">
+                However, there is no free lunch in physics. As you crank up your ISO to see in the dark, you introduce "Digital Noise"—the electronic static that degrades your image quality. A Pichazangu Pro understands the **Base ISO** of their camera to ensure the cleanest possible RAW files for the marketplace.
+             </p>
+          </div>
+          <div className="grid grid-cols-2 gap-6">
+             <div className="aspect-square bg-gray-900 rounded-3xl overflow-hidden border border-white/5 group relative">
+                <img src="https://images.unsplash.com/photo-1495707902641-75cac588d2e9?auto=format&fit=crop&w=800&q=80" className="w-full h-full object-cover grayscale opacity-50 group-hover:opacity-100 transition-opacity" alt="Film Grain" />
+                <div className="absolute bottom-4 left-4 bg-black/60 px-3 py-1 rounded-lg text-[8px] font-black text-white uppercase tracking-widest">Heritage Grain</div>
+             </div>
+             <div className="aspect-square bg-gray-900 rounded-3xl overflow-hidden border border-white/5 group relative">
+                <img src="https://images.unsplash.com/photo-1502920917128-1aa500764cbd?auto=format&fit=crop&w=800&q=80" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000" alt="Digital Noise" />
+                <div className="absolute bottom-4 left-4 bg-red-600 px-3 py-1 rounded-lg text-[8px] font-black text-white uppercase tracking-widest">Modern Silicon</div>
+             </div>
+          </div>
+       </div>
+       <div className="absolute top-0 right-0 p-20 opacity-[0.02] pointer-events-none select-none text-[30rem] font-embroidery whitespace-nowrap rotate-12">
+          RAW
+       </div>
+    </div>
+
+    {/* SECTION 5: THE COMPARISON TABLE */}
+    <div className="space-y-12">
+       <div className="text-center space-y-4">
+          <h3 className="font-embroidery text-5xl italic text-white uppercase">THE EVOLUTION OF <span className="text-red-600">COMMAND</span></h3>
+          <p className="text-gray-500 font-black text-xs uppercase tracking-[0.4em]">Bridging the gap between two eras</p>
+       </div>
+
+       <div className="overflow-x-auto">
+          <table className="w-full border-collapse">
+             <thead>
+                <tr className="border-b-2 border-white/10 text-[10px] font-black text-gray-500 uppercase tracking-widest">
+                   <th className="p-6 text-left">Control Node</th>
+                   <th className="p-6 text-left">The Mechanical Age (Legacy)</th>
+                   <th className="p-6 text-left">The Computational Age (Today)</th>
+                </tr>
+             </thead>
+             <tbody className="text-xs font-bold uppercase tracking-tight text-gray-400">
+                <TableRow icon={<Layers size={14}/>} label="Focusing" legacy="Manual Twist of Glass" modern="Neural-AI Eye Tracking" />
+                <TableRow icon={<Activity size={14}/>} label="Stabilization" legacy="Heavy Cast-Iron Tripods" modern="In-Body 5-Axis Floating Sensor" />
+                <TableRow icon={<Database size={14}/>} label="Verification" legacy="Developed Negatives" modern="Blockchain Metadata & AI Scan" />
+                <TableRow icon={<Zap size={14}/>} label="Exposure" legacy="Handheld Light Meters" modern="Real-time Live Histogram" />
+                <TableRow icon={<Share2 size={14}/>} label="Distribution" legacy="Physical Prints & Couriers" modern="Instant Private Vault Uplink" />
+             </tbody>
+          </table>
+       </div>
+    </div>
+
+    {/* SECTION 6: PRACTICAL PROTOCOL */}
+    <div className="space-y-10">
+       <div className="flex items-center gap-4">
+          <Target className="text-red-600" size={32} />
+          <h3 className="font-embroidery text-4xl italic text-white uppercase">Module 3 Final protocol</h3>
+       </div>
+       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <Step num="01" text="Pick up your camera. Close your eyes. Find every manual control by touch alone. Your fingers must learn the geometry of the dials." />
+          <Step num="02" text="Set your camera to 'Manual' (M). Change your Aperture to f/2.8, then f/16. Listen for the subtle sound of the lens communicating." />
+          <Step num="03" text="Take a photo at 1/10s and 1/1000s. Notice the different 'energy' in the shutter cycle." />
+          <Step num="04" text="Upload your results to your trainee vault for AI review. Completion of this node unlocks Module 4." />
+       </div>
     </div>
   </div>
 );
@@ -680,11 +833,24 @@ const GripCard = ({icon, label, desc}: any) => (
   </div>
 );
 
-const HardwareNode = ({icon, title, desc}: {icon: any, title: string, desc: string}) => (
-  <div className="p-8 bg-white/5 border border-white/5 rounded-3xl hover:bg-white/10 transition-all group">
-     <div className="text-red-600 mb-6 group-hover:scale-110 transition-transform duration-500">{React.cloneElement(icon, { size: 32 })}</div>
-     <h4 className="text-white font-black uppercase text-sm mb-3 tracking-widest">{title}</h4>
-     <p className="text-gray-500 text-[10px] font-bold leading-relaxed uppercase tracking-tight">{desc}</p>
+const TableRow = ({icon, label, legacy, modern}: {icon: any, label: string, legacy: string, modern: string}) => (
+   <tr className="border-b border-white/5 hover:bg-white/5 transition-all group">
+      <td className="p-6">
+         <div className="flex items-center gap-3">
+            <div className="text-red-600 opacity-50 group-hover:opacity-100">{icon}</div>
+            <span className="font-black text-white">{label}</span>
+         </div>
+      </td>
+      <td className="p-6 text-gray-500">{legacy}</td>
+      <td className="p-6 text-white">{modern}</td>
+   </tr>
+);
+
+const StrategyCard = ({ num, title, desc }: { num: string, title: string, desc: string }) => (
+  <div className="p-10 bg-white/5 border border-white/10 rounded-[3rem] hover:bg-white/10 transition-all group">
+    <span className="font-bungee text-3xl text-red-600 block mb-6">{num}</span>
+    <h4 className="text-white font-black uppercase text-xl mb-4 tracking-tighter group-hover:text-red-600 transition-colors">{title}</h4>
+    <p className="text-gray-500 text-xs font-bold leading-relaxed uppercase tracking-tight">{desc}</p>
   </div>
 );
 
