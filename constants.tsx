@@ -78,6 +78,8 @@ export const MOCK_PHOTOS: Photo[] = [
     license: 'Editorial', 
     location: 'Nairobi', 
     tags: ['football', 'kpl'], 
+    matchId: 'm1',
+    jerseyNumber: '10',
     uploadedAt: new Date().toISOString(),
     priceChange24h: 4.5, volume24h: 10,
     historicalPrices: [{ time: '10:00', value: 2400 }, { time: '14:00', value: 2500 }]
@@ -177,112 +179,32 @@ export const MOCK_PHOTOS: Photo[] = [
     isIPPO: true,
     priceChange24h: 0, volume24h: 1,
     historicalPrices: [{ time: '14:00', value: 45000 }]
+  }),
+  // Additional Sports Mock
+  generateMockPhoto({
+    id: 'sp2',
+    url: 'https://images.unsplash.com/photo-1510566337590-2fc1f21d0faa',
+    title: 'Leopards Defensive Wall',
+    photographer: 'WildLens Africa',
+    price: 1800,
+    category: 'Sports',
+    license: 'Editorial',
+    location: 'Nairobi',
+    matchId: 'm1',
+    tags: ['football', 'defence'],
+    uploadedAt: new Date().toISOString(),
   })
 ];
 
-const CERTIFICATE_MILESTONES: Milestone[] = [
-  { id: 'm1', label: 'M1: Observation', status: 'Completed', description: 'Shoot 10 stories using just your eyes/no camera.' },
-  { id: 'm2', label: 'M2: Gear Audit', status: 'Active', description: 'Identify every button on your specific camera model.' },
-  { id: 'm3', label: 'M3: Manual Basics', status: 'Locked', description: 'Balance a shot using only manual settings.' },
-  { id: 'm4', label: 'M4: Sharpness', status: 'Locked', description: 'Shoot 5 tack-sharp images of moving subjects.' },
-  { id: 'm5', label: 'M5: Visual Storyteller', status: 'Locked', description: 'Compose a 3-image sequence that tells a silent story.' },
-  { id: 'm6', label: 'M6: Street Safari', status: 'Locked', description: 'Capture 5 candid moments in a busy market.' },
-  { id: 'm7', label: 'M7: The RAW Edit', status: 'Locked', description: 'Transform a dull photo into a masterpiece via editing.' },
-  { id: 'm8', label: 'M8: The Contract', status: 'Locked', description: 'Draft your first photography service agreement.' },
-  { id: 'm9', label: 'M9: Portfolio Launch', status: 'Locked', description: 'Select your best 10 images for your profile.' },
-];
-
-export const MOCK_ACADEMY_COURSES: AcademyCourse[] = [
-  {
-    id: 'c-cert',
-    tier: 1,
-    title: 'Pichazangu Certificate',
-    description: 'The Amateur-to-Pro Roadmap. 3 Months to regional mastery.',
-    durationMonths: 3,
-    progress: 12,
-    isUnlocked: true,
-    milestones: CERTIFICATE_MILESTONES,
-    modules: [
-      {
-        id: 'month-1',
-        title: 'Month 1: The Foundation',
-        month: 1,
-        lessons: [
-          { id: 'l1', title: '1. Introduction to Photography', type: 'reading', isCompleted: true, proTip: 'Your camera is just a tool; your eye is the actual lens. Start by looking for "stories" before you look for "settings."' },
-          { id: 'l2', title: '2. The Timeline of Light', type: 'reading', isCompleted: false },
-          { id: 'l3', title: '3. The First Cameras', type: 'reading', isCompleted: false },
-          { id: 'l4', title: '4. Milestone 1: Observation Challenge', type: 'practical', isCompleted: false, milestoneId: 'm1' },
-          { id: 'l5', title: '5. Anatomy of the Modern Camera', type: 'reading', isCompleted: false },
-          { id: 'l6', title: '6. Lenses 101', type: 'video', isCompleted: false },
-          { id: 'l7', title: '7. The Image Sensor', type: 'reading', isCompleted: false },
-          { id: 'l8', title: '8. Milestone 2: Gear Audit', type: 'practical', isCompleted: false, milestoneId: 'm2' },
-          { id: 'l9', title: '9. Exposure Triangle Part 1: Aperture', type: 'video', isCompleted: false },
-          { id: 'l10', title: '10. Exposure Triangle Part 2: Shutter Speed', type: 'video', isCompleted: false },
-          { id: 'l11', title: '11. Exposure Triangle Part 3: ISO', type: 'video', isCompleted: false },
-          { id: 'l12', title: '12. Milestone 3: Manual Mode Basics', type: 'practical', isCompleted: false, milestoneId: 'm3' },
-          { id: 'l13', title: '13. Old vs. New Control', type: 'reading', isCompleted: false },
-          { id: 'l14', title: '14. Memory & Storage', type: 'reading', isCompleted: false },
-          { id: 'l15', title: '15. Monthly Review Quiz', type: 'quiz', isCompleted: false },
-        ]
-      },
-      {
-        id: 'month-2',
-        title: 'Month 2: The Craft',
-        month: 2,
-        lessons: [
-          { id: 'l16', title: '16. Holding the Camera', type: 'reading', isCompleted: false },
-          { id: 'l17', title: '17. Autofocus Modes', type: 'video', isCompleted: false },
-          { id: 'l18', title: '18. Metering Modes', type: 'reading', isCompleted: false },
-          { id: 'l19', title: '19. Milestone 4: Sharpness Challenge', type: 'practical', isCompleted: false, milestoneId: 'm4' },
-          { id: 'l20', title: '20. Composition 1: Rule of Thirds', type: 'video', isCompleted: false },
-          { id: 'l21', title: '21. Composition 2: Framing & Space', type: 'video', isCompleted: false },
-          { id: 'l22', title: '22. Color Theory', type: 'reading', isCompleted: false },
-          { id: 'l23', title: '23. Milestone 5: Visual Storyteller', type: 'practical', isCompleted: false, milestoneId: 'm5' },
-          { id: 'l24', title: '24. Portraits: Engaging Souls', type: 'video', isCompleted: false },
-          { id: 'l25', title: '25. Studio Photography', type: 'video', isCompleted: false, proTip: 'In studio photography, the most important light is the one you turn off. Learn to control shadows first.' },
-          { id: 'l26', title: '26. Street Photography', type: 'reading', isCompleted: false },
-          { id: 'l27', title: '27. Milestone 6: Street Safari', type: 'practical', isCompleted: false, milestoneId: 'm6' },
-          { id: 'l28', title: '28. Motion & Sports Action', type: 'video', isCompleted: false },
-          { id: 'l29', title: '29. Wildlife & Nature', type: 'video', isCompleted: false },
-          { id: 'l30', title: '30. Career Path Selection', type: 'quiz', isCompleted: false },
-        ]
-      },
-      {
-        id: 'month-3',
-        title: 'Month 3: The Business',
-        month: 3,
-        lessons: [
-          { id: 'l31', title: '31. Introduction to RAW', type: 'reading', isCompleted: false },
-          { id: 'l32', title: '32. White Balance Mastery', type: 'video', isCompleted: false },
-          { id: 'l33', title: '33. Adobe Lightroom Workflow', type: 'video', isCompleted: false },
-          { id: 'l34', title: '34. Milestone 7: The RAW Edit', type: 'practical', isCompleted: false, milestoneId: 'm7' },
-          { id: 'l35', title: '35. Post-Processing: Retouching', type: 'video', isCompleted: false },
-          { id: 'l36', title: '36. Post-Processing: Color Grading', type: 'video', isCompleted: false },
-          { id: 'l37', title: '37. Ethics & Law (Regional)', type: 'reading', isCompleted: false },
-          { id: 'l38', title: '38. Milestone 8: The Contract', type: 'practical', isCompleted: false, milestoneId: 'm8' },
-          { id: 'l39', title: '39. Pricing your Work', type: 'reading', isCompleted: false, proTip: 'Never say "I’m just an amateur" when talking to a client. Say "I am a Certified Pichazangu Photographer."' },
-          { id: 'l40', title: '40. Pichazangu Dashboard Mastery', type: 'video', isCompleted: false },
-          { id: 'l41', title: '41. Social Media Marketing', type: 'video', isCompleted: false },
-          { id: 'l42', title: '42. Milestone 9: Portfolio Launch', type: 'practical', isCompleted: false, milestoneId: 'm9' },
-          { id: 'l43', title: '43. Customer Service Excellence', type: 'reading', isCompleted: false },
-          { id: 'l44', title: '44. The Final Examination', type: 'quiz', isCompleted: false },
-          { id: 'l45', title: '45. Graduation & License', type: 'reading', isCompleted: false },
-        ]
-      }
-    ]
-  }
-];
-
-export const MOCK_GRADES: Grade[] = [
-  { id: 'g1', assignmentName: 'Portrait Composition', score: 92, feedback: 'Excellent.', gradedBy: 'Ali Studio', date: '2024-05-12' }
-];
-
 export const MOCK_MATCHES: Match[] = [
-  { id: 'm1', league: 'KPL', homeTeam: 'Gor Mahia', awayTeam: 'AFC Leopards', homeScore: 2, awayScore: 1, minute: 68, status: 'Live' }
+  { id: 'm1', league: 'KPL', homeTeam: 'Gor Mahia', awayTeam: 'AFC Leopards', homeScore: 2, awayScore: 1, minute: 68, status: 'Live' },
+  { id: 'm2', league: 'NSL', homeTeam: 'Shabana FC', awayTeam: 'Muranga Seal', homeScore: 0, awayScore: 0, minute: 15, status: 'Live' },
+  { id: 'm3', league: 'Women', homeTeam: 'Vihiga Queens', awayTeam: 'Gaspo Women', homeScore: 3, awayScore: 1, minute: 90, status: 'Finished' }
 ];
 
 export const MOCK_PLAYERS: PlayerStats[] = [
-  { id: 'p1', name: 'Benson Omala', team: 'Gor Mahia', jerseyNumber: '10', position: 'Forward', matches: 24, goals: 18, assists: 4, image: 'https://i.pravatar.cc/150?u=omala' }
+  { id: 'p1', name: 'Benson Omala', team: 'Gor Mahia', jerseyNumber: '10', position: 'Forward', matches: 24, goals: 18, assists: 4, image: 'https://i.pravatar.cc/150?u=omala' },
+  { id: 'p2', name: 'Cliff Nyakeya', team: 'AFC Leopards', jerseyNumber: '11', position: 'Midfielder', matches: 22, goals: 6, assists: 12, image: 'https://i.pravatar.cc/150?u=cliff' },
 ];
 
 export const MOCK_GIGS: Gig[] = [
@@ -320,8 +242,30 @@ export const MOCK_VAULTS: Vault[] = [
     passkey: '882910', 
     photoCount: 45, 
     lastUpdated: '2024-05-20', 
+    shootingDate: '2024-05-15',
+    location: 'Nairobi',
     isPublic: false, 
     archiveStatus: 'Permanent' 
+  },
+  {
+    id: 'v-stadium-1',
+    clientId: 'public',
+    clientName: 'KPL Derby Archive',
+    clientEmail: 'admin@kpl.co.ke',
+    clientPhone: '0000',
+    clientAvatar: 'https://images.unsplash.com/photo-1574629810360-7efbbe195018',
+    photographerId: 'ph1',
+    photographerName: 'Ali Studio',
+    passkey: '',
+    photoCount: 120,
+    lastUpdated: '2024-05-22',
+    shootingDate: '2024-05-22',
+    location: 'Nairobi',
+    isPublic: true,
+    targetScreen: 'Sports',
+    price: 1500,
+    eventName: 'Gor Mahia vs AFC Leopards',
+    archiveStatus: 'Permanent'
   }
 ];
 
@@ -344,3 +288,86 @@ export const MOCK_CASTING_CALLS: CastingCall[] = [
 export const MOCK_ARTICLES: Article[] = [
   { id: 'a1', title: 'Lighting', excerpt: 'Tips.', thumbnail: 'https://picsum.photos/seed/learn1/400/300', category: 'Lighting' }
 ];
+
+// Fixed 'MOCK_ACADEMY_COURSES' export to satisfy imports in Learn.tsx.
+// Updated to include quiz data and more complex lesson types.
+export const MOCK_ACADEMY_COURSES: AcademyCourse[] = [
+  {
+    id: 'c-cert',
+    tier: 1,
+    title: 'Zangu Certificate',
+    description: 'Master the fundamentals of regional photography.',
+    durationMonths: 3,
+    progress: 45,
+    isUnlocked: true,
+    milestones: [],
+    modules: [
+      {
+        id: 'm1',
+        title: 'Node 01: Foundations',
+        lessons: [
+          { id: 'l1', title: 'Philosophy of the Lens', type: 'reading', isCompleted: true },
+          { id: 'l2', title: 'Exposure Triangle', type: 'video', isCompleted: true },
+        ]
+      },
+      {
+        id: 'm2',
+        title: 'Node 02: Hardware',
+        lessons: [
+          { 
+            id: 'l13', 
+            title: 'Old Features vs Modern Mastery', 
+            type: 'video', 
+            isCompleted: false,
+            videoUrl: 'https://sample-videos.com/video123/mp4/720/big_buck_bunny_720p_1mb.mp4' 
+          },
+          {
+            id: 'l14',
+            title: 'Knowledge Sync 02',
+            type: 'quiz',
+            isCompleted: false,
+            proTip: "ISO is digital gain, not physical sensitivity in modern sensors."
+          }
+        ]
+      },
+      {
+        id: 'm3',
+        title: 'Node 03: Biomechanics',
+        lessons: [
+          { 
+            id: 'l16', 
+            title: 'The Handshake (Grip)', 
+            type: 'practical', 
+            isCompleted: false,
+            proTip: "Support the weight of the lens with your palm, not just your fingers."
+          },
+        ]
+      },
+      {
+        id: 'm4',
+        title: 'Node 04: Specialization',
+        lessons: [
+          { id: 'l30', title: 'Finding Your Field', type: 'reading', isCompleted: false },
+          { id: 'l24', title: 'Portraiture Foundations', type: 'video', isCompleted: false },
+        ]
+      }
+    ]
+  }
+];
+
+export const MOCK_QUIZ_DATA: Record<string, any> = {
+  'l14': {
+    questions: [
+      {
+        q: "What does ISO stand for in the context of digital sensors?",
+        options: ["Internal Sensor Output", "International Organization for Standardization", "Imaging Speed Optics", "Image Signal Optimization"],
+        correct: 1
+      },
+      {
+        q: "In a 'Decisive Moment' street shot, which setting is usually prioritized?",
+        options: ["Aperture", "Shutter Speed", "White Balance", "Digital Zoom"],
+        correct: 1
+      }
+    ]
+  }
+};

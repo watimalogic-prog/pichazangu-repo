@@ -33,6 +33,7 @@ export interface UserProfile {
   biography?: string;
   basePrice?: number;
   performanceScore?: number;
+  photographyGear?: string;
 }
 
 export interface MarketState {
@@ -87,7 +88,6 @@ export interface Photo {
   volume24h?: number;
   historicalPrices?: { time: string; value: number }[];
   isIPPO?: boolean;
-  // Vault specific enhancements
   isStarred?: boolean;
   proofingStatus?: 'Pending' | 'Approved' | 'Rejected';
   feedback?: PhotoFeedback[];
@@ -114,12 +114,15 @@ export interface Vault {
   passkey: string;
   photoCount: number;
   lastUpdated: string;
+  shootingDate: string;
+  location: string;     
   isPublic: boolean;
   archiveStatus: 'Active' | 'Archived' | 'Permanent';
   eventName?: string;
   description?: string;
   price?: number; 
   status?: 'locked' | 'unlocked' | 'paid' | 'preview';
+  targetScreen?: 'Sports' | 'Fashion' | 'Wildlife' | 'Street';
 }
 
 export interface Transaction {

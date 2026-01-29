@@ -8,20 +8,22 @@ import Learn from './pages/Learn';
 import Gigz from './pages/Gigz';
 import ClientProfile from './pages/ClientProfile';
 import PhotographerProfile from './pages/PhotographerProfile';
+import MasterClientDashboard from './pages/MasterClientDashboard'; // NEW
 import MediaHouse from './pages/MediaHouse';
 import VaultAccess from './pages/VaultAccess';
 import PrivateGallery from './pages/PrivateGallery';
 import FashionHub from './pages/FashionHub';
 import SportsHub from './pages/SportsHub';
 import StreetHub from './pages/StreetHub';
+import WildlifeHub from './pages/WildlifeHub';
 import StyleHub from './pages/StyleHub';
 import About from './pages/About';
-import Navigation from './components/Navigation';
 import GlobalToast from './components/GlobalToast';
-import { useUserStore, useThemeStore } from './store/useAppStore';
+import AppLayout from './components/AppLayout';
+import { useUserStore, useThemeStore } from '../store/useAppStore';
 
 const App: React.FC = () => {
-  const { user, login, logout } = useUserStore();
+  const { user, login } = useUserStore();
   const { theme } = useThemeStore();
 
   // Apply theme to HTML root
@@ -39,53 +41,41 @@ const App: React.FC = () => {
   return (
     <Router>
       <div className={`min-h-screen transition-colors duration-500 ${theme === 'dark' ? 'bg-black text-white' : 'bg-gray-50 text-gray-900'}`}>
-        <Navigation 
-          userRole={user?.role || null} 
-          userName={user?.name || null}
-          onLogout={logout} 
-          onRoleSwitch={login}
-          onLoginRequest={() => {
-             window.location.hash = '/';
-          }} 
-        />
-        
-        <main className="flex-1 w-full">
+        <AppLayout>
           <Routes>
-            <Route path="/" element={!user ? <LandingPage onLogin={login} /> : <Navigate to="/trending" />} />
+            <Route path="/" element={!user ? <LandingPage onLogin={login} /> : <Navigate to="/trending" replace />} />
             <Route path="/about" element={<About />} />
-            <Route path="/trending" element={<div className="max-w-7xl mx-auto px-4 py-6 md:pt-24 pb-24"><Trending userRole={user?.role || null} /></div>} />
-            <Route path="/stock" element={<div className="max-w-7xl mx-auto px-4 py-6 md:pt-24 pb-24"><StockMarket userRole={user?.role || null} /></div>} />
-            <Route path="/sports" element={<div className="max-w-7xl mx-auto px-4 py-6 md:pt-24 pb-24"><SportsHub userRole={user?.role || null} /></div>} />
-            <Route path="/fashion" element={<div className="max-w-7xl mx-auto px-4 py-6 md:pt-24 pb-24"><FashionHub userRole={user?.role || null} /></div>} />
-            <Route path="/street" element={<div className="max-w-7xl mx-auto px-4 py-6 md:pt-24 pb-24"><StreetHub userRole={user?.role || null} /></div>} />
-            <Route path="/wildlife" element={<div className="max-w-7xl mx-auto px-4 py-6 md:pt-24 pb-24"><CategoryPage title="Wildlife" category="Wildlife" showGeo /></div>} />
-            <Route path="/learn" element={<Learn />} />
-            <Route path="/gigz" element={<div className="max-w-7xl mx-auto px-4 py-6 md:pt-24 pb-24"><Gigz userRole={user?.role || 'client'} /></div>} />
+            <Route path="/trending" element={<div className="max-w-7xl mx-auto px-4 py-6 md:pt-24"><Trending userRole={user?.role || null} /></div>} />
+            <Route path="/stock" element={<div className="max-w-7xl mx-auto px-4 py-6 md:pt-24"><StockMarket userRole={user?.role || null} /></div>} />
+            <Route path="/sports" element={<div className="max-w-7xl mx-auto px-4 py-6 md:pt-24"><SportsHub userRole={user?.role || null} /></div>} />
+            <Route path="/fashion" element={<div className="max-w-7xl mx-auto px-4 py-6 md:pt-24"><FashionHub userRole={user?.role || null} /></div>} />
+            <Route path="/street" element={<div className="max-w-7xl mx-auto px-4 py-6 md:pt-24"><StreetHub userRole={user?.role || null} /></div>} />
+            <Route path="/wildlife" element={<div className="max-w-7xl mx-auto px-4 py-6 md:pt-24"><WildlifeHub userRole={user?.role || null} /></div>} />
+            <Route path="/learn" element={<div className="md:pt-10"><Learn /></div>} />
+            <Route path="/gigz" element={<div className="max-w-7xl mx-auto px-4 py-6 md:pt-24"><Gigz userRole={user?.role || 'client'} /></div>} />
 
             <Route 
               path="/client-profile" 
-              element={user?.role === 'client' ? <ClientProfile /> : <Navigate to="/" />} 
+              element={user?.role === 'client' ? <MasterClientDashboard /> : <Navigate to="/" replace />} 
             />
-            {/* Verify photographer dashboard route visibility */}
             <Route 
               path="/photographer-profile" 
-              element={user?.role === 'photographer' ? <PhotographerProfile /> : <Navigate to="/" />} 
+              element={user?.role === 'photographer' ? <PhotographerProfile /> : <Navigate to="/" replace />} 
             />
             <Route 
               path="/style-lab" 
-              element={user?.role === 'photographer' ? <StyleHub /> : <Navigate to="/" />} 
+              element={user?.role === 'photographer' ? <StyleHub /> : <Navigate to="/" replace />} 
             />
             <Route 
               path="/media-house" 
-              element={user?.role === 'media' ? <MediaHouse /> : <Navigate to="/" />} 
+              element={user?.role === 'media' ? <MediaHouse /> : <Navigate to="/" replace />} 
             />
-            <Route path="/vault-access" element={<VaultAccess />} />
+            <Route path="/vault-access" element={<div className="md:pt-20"><VaultAccess /></div>} />
             <Route path="/gallery/:vaultId" element={<PrivateGallery />} />
 
-            <Route path="*" element={<Navigate to="/" />} />
+            <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
-        </main>
-        
+        </AppLayout>
         <GlobalToast />
       </div>
     </Router>

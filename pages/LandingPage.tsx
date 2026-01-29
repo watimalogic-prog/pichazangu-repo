@@ -7,9 +7,10 @@ import {
   ArrowRight, ArrowDown, BookOpen, Newspaper,
   Lock, Radio, FileText, Send, Sparkles, CreditCard, 
   Target, Globe2, Layers, Repeat, Clock, HelpCircle,
-  Play, ChevronRight, Share2, Award, X, Check, Eye, TrendingUp, Briefcase
+  Play, ChevronRight, Share2, Award, X, Check, Eye, TrendingUp, Briefcase,
+  Flame, ShieldAlert, Cpu, Database, Fingerprint, History, Building2, UserCircle
 } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 interface LandingPageProps {
   onLogin: (role: UserRole) => void;
@@ -17,7 +18,9 @@ interface LandingPageProps {
 
 const TERMS = {
   photographer: [
-    "70% Royalty Guarantee: Earn the highest creator share in East Africa.",
+    "99% Royalty Guarantee: You keep almost everything you earn.",
+    "Decide Your Price: You have full control over the base price of your assets.",
+    "Fixed Service Fees: Only 10 KES (Private), 20 KES (Public Market), or 50 KES (Live Wire) added per license.",
     "30-Year Archive: We commit to storing high-res originals for three decades.",
     "Zero Compression: Your work is served exactly as uploaded, no pixel loss.",
     "Glass-Shield Protection: Automatic military-grade watermarking on all previews.",
@@ -29,8 +32,6 @@ const TERMS = {
     "Prohibited Content: Zero tolerance for non-consensual or illegal imagery.",
     "Regional Payouts: Minimum withdrawal limits for M-Pesa, MTN, and Airtel.",
     "Metadata Integrity: Photographers are responsible for GPS accuracy.",
-    "Academy Path: Access requires progress in Picha Academy curriculum.",
-    "Escrow Security: Payments held until buyer successfully unlocks the asset.",
     "Legacy Rights: Ability to designate an heir for long-term archive royalties."
   ],
   media: [
@@ -69,13 +70,35 @@ const TERMS = {
   ]
 };
 
+const NAV_MAP: Record<string, string> = {
+  "Discovery": "/trending",
+  "Market": "/stock",
+  "Academy": "/learn",
+  "Gigz": "/gigz",
+  "Vision": "/about",
+  "Nairobi": "/trending",
+  "Kampala": "/trending",
+  "Dar": "/trending",
+  "Kigali": "/trending",
+  "WILDLIFE": "/wildlife",
+  "URBAN STREET": "/street",
+  "FASHION": "/fashion",
+  "MEDIA WIRE": "/trending",
+  "Privacy": "/about",
+  "Protocol": "/about",
+  "KRA Invoicing": "/client-profile",
+  "NDPA": "/about"
+};
+
 const LandingPage: React.FC<LandingPageProps> = ({ onLogin }) => {
+  const navigate = useNavigate();
   const [currentBg, setCurrentBg] = useState(0);
   const [showTerms, setShowTerms] = useState<UserRole | null>(null);
   const [hasAccepted, setHasAccepted] = useState(false);
+  
   const { scrollY } = useScroll();
-  const y1 = useTransform(scrollY, [0, 500], [0, 200]);
-  const opacity = useTransform(scrollY, [0, 300], [1, 0]);
+  const yHero = useTransform(scrollY, [0, 500], [0, 150]);
+  const opacityHero = useTransform(scrollY, [0, 600], [1, 0]);
 
   const backgrounds = [
     { url: 'https://images.unsplash.com/photo-1547471080-7cc2caa01a7e?auto=format&fit=crop&w=1920&q=90', title: 'Serengeti Wildlife', effect: 'animate-kenburns-zoom-in' },
@@ -85,36 +108,16 @@ const LandingPage: React.FC<LandingPageProps> = ({ onLogin }) => {
   ];
 
   const benefits = [
-    { title: "M-Pesa STK", desc: "Instant mobile money integration.", icon: <Smartphone /> },
-    { title: "MTN MoMo", desc: "Seamless regional payouts.", icon: <CreditCard /> },
-    { title: "70% Royalties", desc: "Highest creator share.", icon: <DollarSign /> },
-    { title: "Picha Academy", desc: "Pro diploma tracks.", icon: <BookOpen /> },
-    { title: "Glass Shield", desc: "Military watermarking.", icon: <ShieldCheck /> },
-    { title: "30-Year Archive", desc: "Decades of secure storage.", icon: <Layers /> },
-    { title: "KRA Ready", desc: "Automated tax compliance.", icon: <FileText /> },
-    { title: "AI Tagging", desc: "Gemini-powered discovery.", icon: <Sparkles /> },
-    { title: "News Wire", desc: "Direct media pipelines.", icon: <Radio /> },
-    { title: "Geotagged", desc: "Local neighborhood search.", icon: <Globe2 /> },
-    { title: "Bulk Media", desc: "Agency-scale volume deals.", icon: <Layers /> },
-    { title: "Exclusive Rights", desc: "Bidding for breaking news.", icon: <Lock /> },
-    { title: "Authentic Africa", desc: "Zero stock-photo cliches.", icon: <Globe /> },
-    { title: "Smart Contracts", desc: "Escrow for every gig.", icon: <ShieldCheck /> },
-    { title: "Live Analytics", desc: "Real-time market velocity.", icon: <Zap /> },
-    { title: "FTP Sync", desc: "Automated media house feeds.", icon: <Repeat /> },
-    { title: "Flash Gigs", desc: "Instant assignment alerts.", icon: <Clock /> },
-    { title: "Peer Review", desc: "Professional quality control.", icon: <Award /> },
-    { title: "Regional Relevance", desc: "Built for local culture.", icon: <Globe /> },
-    { title: "Mobile Field", desc: "Upload while on assignment.", icon: <Smartphone /> },
-    { title: "Whale Alerts", desc: "Track high-volume buyers.", icon: <Target /> },
-    { title: "Archive Insurance", desc: "Protected legacy storage.", icon: <Lock /> },
-    { title: "Gig Board", desc: "Direct client connections.", icon: <Users /> },
-    { title: "Discovery", desc: "AI-enhanced exploration.", icon: <Eye /> },
-    { title: "Instant STK", desc: "Fastest checkout in Africa.", icon: <Smartphone /> },
-    { title: "Safe Store", desc: "High-res raw protection.", icon: <ShieldCheck /> },
-    { title: "Global API", desc: "Sync to world media outlets.", icon: <Globe2 /> },
-    { title: "Pro Badging", desc: "Verified elite status.", icon: <Award /> },
-    { title: "Tax-Free Payouts", desc: "Smart regional compliance.", icon: <DollarSign /> },
-    { title: "24/7 AI Tutor", desc: "On-demand tech support.", icon: <HelpCircle /> }
+    { title: "M-Pesa STK", desc: "Instant mobile money integration.", icon: <Smartphone />, link: "/stock" },
+    { title: "MTN MoMo", desc: "Seamless regional payouts.", icon: <CreditCard />, link: "/stock" },
+    { title: "99% Royalties", desc: "Keep almost everything.", icon: <DollarSign />, link: "/about" },
+    { title: "Picha Academy", desc: "Pro diploma tracks.", icon: <BookOpen />, link: "/learn" },
+    { title: "Glass Shield", desc: "Military watermarking.", icon: <ShieldCheck />, link: "/about" },
+    { title: "30-Year Archive", desc: "Decades of secure storage.", icon: <Layers />, link: "/about" },
+    { title: "KRA Ready", desc: "Automated tax compliance.", icon: <FileText />, link: "/about" },
+    { title: "AI Tagging", desc: "Gemini-powered discovery.", icon: <Sparkles />, link: "/trending" },
+    { title: "News Wire", desc: "Direct media pipelines.", icon: <Radio />, link: "/trending" },
+    { title: "Geotagged", desc: "Local neighborhood search.", icon: <Globe2 />, link: "/trending" }
   ];
 
   useEffect(() => {
@@ -137,197 +140,203 @@ const LandingPage: React.FC<LandingPageProps> = ({ onLogin }) => {
   };
 
   return (
-    <div className="bg-black text-white overflow-x-hidden selection:bg-[#E31E24]">
-      {/* --- TOP NAVIGATION BAR --- */}
-      <nav className="fixed top-0 left-0 right-0 h-20 glass z-[100] px-6 md:px-12 flex items-center justify-between border-b border-white/5">
-        <div className="flex items-center gap-10">
-          <Link to="/" className="flex items-center gap-3 group">
-            <div className="bg-[#E31E24] text-white p-2.5 rounded-2xl group-hover:rotate-12 transition-transform shadow-[0_0_20px_rgba(227,30,36,0.4)]">
-              <Camera size={24} />
+    <div className="bg-[#050505] text-white overflow-x-hidden selection:bg-[#E31E24] font-modern">
+      
+      <nav className="fixed top-0 left-0 right-0 h-24 glass z-[100] px-8 md:px-16 flex items-center justify-between border-b border-white/5">
+        <div className="flex items-center gap-12">
+          <Link to="/" className="flex items-center gap-4 group">
+            <div className="bg-[#E31E24] text-white p-3 rounded-2xl group-hover:rotate-12 transition-all duration-500 shadow-[0_0_30px_rgba(227,30,36,0.6)]">
+              <Camera size={28} />
             </div>
-            <div className="font-embroidery text-3xl text-white tracking-tighter uppercase italic">
-              PICHA<span className="text-[#E31E24]">ZANGU</span>
+            <div className="font-embroidery text-4xl text-white tracking-tighter uppercase italic leading-none">
+              PICHA<span className="text-[#E31E24]">zangu</span>
             </div>
           </Link>
-          <div className="hidden xl:flex gap-1.5 items-center">
-            <LandingNavLink to="/trending" icon={<TrendingUp size={14}/>} label="Discovery" />
-            <LandingNavLink to="/stock" icon={<Zap size={14}/>} label="Market" />
-            <LandingNavLink to="/gigz" icon={<Briefcase size={14}/>} label="Gigz" />
-            <LandingNavLink to="/about" icon={<Eye size={14}/>} label="Vision" />
+          <div className="hidden xl:flex gap-4 items-center">
+            <LandingNavLink to="/trending" icon={<TrendingUp size={16}/>} label="The Feed" />
+            <LandingNavLink to="/stock" icon={<Zap size={16}/>} label="The Market" />
+            <LandingNavLink to="/learn" icon={<BookOpen size={16}/>} label="The Academy" />
+            <LandingNavLink to="/gigz" icon={<Briefcase size={16}/>} label="Opportunities" />
           </div>
-        </div>
-        <div className="flex items-center gap-4">
-           <button 
-            onClick={() => handlePortalAction('client')}
-            className="bg-[#E31E24] text-white px-8 py-2.5 rounded-full text-[10px] font-black uppercase tracking-widest shadow-lg shadow-red-900/40 hover:bg-white hover:text-black transition-all"
-           >
-             Login Portal
-           </button>
         </div>
       </nav>
 
-      {/* --- HERO: IMMERSIVE CINEMATIC SECTION --- */}
-      <section className="relative min-h-screen w-full flex items-center justify-center overflow-hidden py-32">
+      <section className="relative min-h-screen w-full flex items-center justify-center overflow-hidden pt-24">
         <AnimatePresence mode="wait">
           <motion.div
             key={currentBg}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 2.5, ease: "easeInOut" }}
+            initial={{ opacity: 0, scale: 1.1 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.95 }}
+            transition={{ duration: 2, ease: "easeInOut" }}
             className="absolute inset-0 z-0"
           >
             <img 
               src={backgrounds[currentBg].url} 
               className={`w-full h-full object-cover will-change-transform ${backgrounds[currentBg].effect}`} 
-              alt="Pichazangu Cinematic"
+              alt="Cinematic Background"
             />
-            {/* ENHANCED OVERLAYS: Deep vignettes for branding visibility */}
-            <div className="absolute inset-0 bg-gradient-to-b from-black/100 via-black/30 to-black/100" />
+            <div className="absolute inset-0 bg-gradient-to-b from-black/80 via-black/20 to-black/100" />
             <div className="absolute inset-0 bg-black/40 mix-blend-multiply" />
-            <div className="absolute inset-x-0 top-0 h-96 bg-gradient-to-b from-black/80 to-transparent pointer-events-none" />
           </motion.div>
         </AnimatePresence>
 
-        <motion.div style={{ opacity, y: y1 }} className="relative z-10 text-center px-6 max-w-6xl flex flex-col items-center">
-          {/* Enhanced radial shadow behind the brand title to ensure total visibility */}
-          <div className="mb-16 relative flex items-center justify-center w-full max-w-[90vw]">
-             <div className="absolute inset-0 bg-black/95 blur-[140px] scale-150 rounded-full opacity-80" />
-             <div className="relative transform-gpu scale-90 md:scale-100 lg:scale-110">
-                <Logo size="lg" className="drop-shadow-[0_0_120px_rgba(227,30,36,0.8)] transition-all duration-700 hover:brightness-125" />
+        <motion.div style={{ opacity: opacityHero, y: yHero }} className="relative z-10 text-center px-6 max-w-7xl flex flex-col items-center">
+          <div className="mb-12 relative">
+             <div className="absolute inset-0 bg-[#E31E24]/10 blur-[150px] rounded-full scale-150 animate-pulse" />
+             <Logo size="lg" className="relative drop-shadow-[0_0_120px_rgba(227,30,36,0.8)]" />
+             <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 flex items-center gap-2 text-[10px] font-black text-red-600 uppercase tracking-[0.6em] animate-pulse">
+                <div className="w-1.5 h-1.5 bg-red-600 rounded-full" />
+                SYSTEM_LIVE_V4
              </div>
           </div>
           
-          <h1 className="font-embroidery text-6xl md:text-[10rem] italic leading-[0.8] stitched-text mb-10 text-glow drop-shadow-[0_10px_30px_rgba(0,0,0,1)]">
-            STITCHING <br/> <span className="font-embroidery-sketch text-[#E31E24]">AFRICAN</span> STORIES
-          </h1>
-          <p className="text-xl md:text-3xl font-black uppercase tracking-[0.4em] text-white/95 mb-16 drop-shadow-[0_8px_20px_rgba(0,0,0,1)]">
-            The Premier <span className="text-[#E31E24] text-glow">Media Hub</span> for East Africa
+          <div className="mb-8 relative">
+            <h1 className="font-embroidery text-8xl md:text-[14rem] italic leading-[0.75] uppercase text-white drop-shadow-[0_20px_80px_rgba(0,0,0,1)] text-glow-red select-none">
+              PICH<span className="text-[#E31E24] text-outline-white">azangu</span>
+            </h1>
+            <h2 className="font-embroidery text-4xl md:text-6xl text-white/40 -mt-4 uppercase tracking-tight relative z-20">STITCHING THE SOUL OF AFRICA</h2>
+          </div>
+          
+          <p className="text-xl md:text-2xl font-medium uppercase tracking-[0.4em] text-white/80 mb-12 max-w-4xl leading-relaxed">
+            The Premier <span className="text-[#E31E24] font-embroidery-sketch text-4xl">Decentralized</span> Media Archive.
           </p>
-          <div className="flex flex-col md:flex-row items-center justify-center gap-6">
-            <Link 
-              to="/trending"
-              className="group relative px-12 py-6 bg-white text-black font-black rounded-full overflow-hidden hover:pr-16 transition-all shadow-2xl"
-            >
-              <span className="relative z-10 flex items-center gap-3 uppercase tracking-widest text-xs">Explore Archive <ChevronRight size={18} /></span>
-              <div className="absolute top-0 right-0 h-full w-0 bg-[#E31E24] group-hover:w-12 transition-all duration-300" />
-            </Link>
-            <button 
+
+          {/* SIGN UP CARDS DIRECTLY ON LANDING */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 w-full max-w-5xl mt-8">
+            <RoleCard 
+              icon={<Camera size={32} />} 
+              title="Photographer" 
+              desc="99% Royaltes. You set the price."
               onClick={() => handlePortalAction('photographer')}
-              className="group px-12 py-6 bg-transparent border-2 border-white/50 text-white font-black rounded-full hover:border-[#E31E24] hover:bg-[#E31E24]/10 transition-all flex items-center gap-3 uppercase tracking-widest text-xs"
-            >
-              Upload Legacy <ArrowRight size={18} />
-            </button>
+              accent
+            />
+            <RoleCard 
+              icon={<Building2 size={32} />} 
+              title="Media" 
+              desc="Instant high-res news wire."
+              onClick={() => handlePortalAction('media')}
+            />
+            <RoleCard 
+              icon={<UserCircle size={32} />} 
+              title="Client" 
+              desc="Authentic regional stock."
+              onClick={() => handlePortalAction('client')}
+            />
           </div>
         </motion.div>
 
-        <motion.div 
-          initial={{ opacity: 0 }} 
-          animate={{ opacity: 1 }} 
-          transition={{ delay: 2, duration: 1 }}
-          className="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center gap-4 z-10"
-        >
-          <span className="text-[10px] font-black uppercase tracking-[0.5em] text-white/50">Scroll to Explore</span>
-          <div className="w-[2px] h-16 bg-gradient-to-b from-[#E31E24] to-transparent rounded-full animate-bounce shadow-[0_0_10px_rgba(227,30,36,0.8)]" />
-        </motion.div>
-      </section>
-
-      {/* --- APP PORTAL CARDS WITH LOGIN BUTTONS --- */}
-      <section className="relative py-32 px-6">
-        <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8">
-           <AppPortalCard 
-              icon={<Newspaper size={40} />}
-              title="MEDIA HOUSE"
-              desc="Verified high-res breaking news wire with direct FTP sync."
-              cta="MEDIA LOGIN"
-              onClick={() => handlePortalAction('media')}
-              delay={0.2}
-           />
-           <AppPortalCard 
-              icon={<Camera size={40} />}
-              title="CREATORS"
-              desc="70% Royalties, 30-year archival protection, and AI metadata."
-              cta="CREATOR LOGIN"
-              onClick={() => handlePortalAction('photographer')}
-              accent
-              delay={0.4}
-           />
-           <AppPortalCard 
-              icon={<Smartphone size={40} />}
-              title="BUYERS"
-              desc="Authentic stock assets with M-Pesa & MoMo integrated payments."
-              cta="CLIENT LOGIN"
-              onClick={() => handlePortalAction('client')}
-              delay={0.6}
-           />
+        <div className="absolute bottom-12 left-1/2 -translate-x-1/2 flex flex-col items-center gap-4 z-10 opacity-40">
+          <span className="text-[9px] font-black uppercase tracking-[0.8em]">Deep Exploration</span>
+          <div className="w-[2px] h-20 bg-gradient-to-b from-[#E31E24] to-transparent rounded-full animate-bounce" />
         </div>
       </section>
 
-      {/* --- TERMS & CONDITIONS MODAL --- */}
+      <section className="py-40 bg-white text-black relative overflow-hidden">
+        <div className="max-w-6xl mx-auto px-8 relative z-10 space-y-32">
+           <div className="grid grid-cols-1 lg:grid-cols-2 gap-24 items-start">
+              <div className="space-y-12 sticky top-40">
+                 <div className="flex items-center gap-4">
+                    <History size={32} className="text-[#E31E24]" />
+                    <span className="text-[#E31E24] font-black text-xs uppercase tracking-[0.6em]">The Philosophy of the Archive</span>
+                 </div>
+                 <h2 className="font-embroidery text-7xl md:text-9xl italic leading-[0.8] uppercase">RECLAIMING <br/><span className="text-[#E31E24]">OUR LENS</span></h2>
+                 <p className="text-2xl text-gray-800 font-medium leading-relaxed uppercase tracking-tight">
+                    For over a century, the visual identity of East Africa has been curated by outsiders.
+                 </p>
+                 <div className="p-10 bg-[#E31E24] text-white rounded-[3.5rem] shadow-2xl shadow-red-200">
+                    <h4 className="font-bungee text-2xl mb-4 text-white">THE ZANGU MANIFESTO</h4>
+                    <p className="text-lg font-bold uppercase leading-relaxed text-red-50">
+                       "Every click captured by a local pro is a brick in the wall of our digital heritage."
+                    </p>
+                 </div>
+              </div>
+
+              <div className="prose prose-xl prose-red max-w-none space-y-16 py-10">
+                 <div className="space-y-8">
+                    <h3 className="font-modern font-black text-2xl text-[#E31E24] uppercase tracking-tighter">I. 99% Creator Economy</h3>
+                    <p className="text-gray-600 leading-relaxed font-medium uppercase text-sm tracking-wide">
+                       We flipped the agency model. Photographers now keep 99% of their revenue. We only add a tiny service fee (10/20/50 KES) to facilitate the decentralized node storage and M-Pesa distribution.
+                    </p>
+                 </div>
+              </div>
+           </div>
+
+           <motion.div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
+              {benefits.map((b, i) => (
+                <motion.div
+                  key={i}
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  whileInView={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.8 }}
+                  viewport={{ once: false, amount: 0.2 }}
+                  transition={{ delay: i * 0.05, duration: 0.5 }}
+                >
+                  <Link to={b.link} className="bg-gray-50 border border-gray-100 p-8 rounded-[2.5rem] hover:bg-black hover:text-white transition-all duration-500 group cursor-pointer block h-full">
+                    <div className="text-[#E31E24] mb-6 group-hover:scale-110 transition-transform">{b.icon}</div>
+                    <h5 className="font-modern font-black text-sm mb-2">{b.title}</h5>
+                    <p className="text-[10px] font-black uppercase opacity-60 leading-tight">{b.desc}</p>
+                  </Link>
+                </motion.div>
+              ))}
+           </motion.div>
+        </div>
+      </section>
+
       <AnimatePresence>
         {showTerms && (
-          <div className="fixed inset-0 z-[200] flex items-center justify-center p-6 bg-black/95 backdrop-blur-xl overflow-y-auto">
+          <div className="fixed inset-0 z-[200] flex items-center justify-center p-6 bg-black/95 backdrop-blur-2xl">
             <motion.div 
-              initial={{ scale: 0.9, opacity: 0, y: 20 }}
+              initial={{ scale: 0.9, opacity: 0, y: 40 }}
               animate={{ scale: 1, opacity: 1, y: 0 }}
-              exit={{ scale: 0.9, opacity: 0, y: 20 }}
-              className="bg-white text-black w-full max-w-2xl rounded-[3rem] shadow-2xl overflow-hidden my-auto"
+              exit={{ scale: 0.9, opacity: 0, y: 40 }}
+              className="bg-white text-black w-full max-w-3xl rounded-[4rem] shadow-[0_50px_100px_rgba(0,0,0,0.5)] overflow-hidden flex flex-col max-h-[90vh]"
             >
-              <div className="bg-[#E31E24] p-10 text-white flex justify-between items-center">
+              <div className="bg-[#E31E24] p-12 text-white flex justify-between items-center">
                  <div>
-                    <h2 className="font-embroidery text-4xl italic mb-1 uppercase">Protocol Acceptance</h2>
-                    <p className="text-red-100 text-[10px] font-black uppercase tracking-widest">Registration v2025.1 • Verification Track</p>
+                    <h2 className="font-embroidery text-5xl italic mb-1 uppercase tracking-tighter">PROTOCOL CONSENT</h2>
+                    <p className="text-red-100 text-[10px] font-black uppercase tracking-[0.5em]">Sector: {showTerms.toUpperCase()}</p>
                  </div>
                  <button onClick={() => setShowTerms(null)} className="p-4 bg-black/20 rounded-full hover:bg-black/40 transition-colors">
-                    <X size={24}/>
+                    <X size={28} className="text-white" />
                  </button>
               </div>
 
-              <div className="p-10 max-h-[50vh] overflow-y-auto custom-scrollbar bg-gray-50 border-b border-gray-100">
-                <div className="flex items-center gap-4 mb-8 pb-4 border-b border-gray-200">
-                   <div className="w-12 h-12 bg-[#E31E24] rounded-2xl flex items-center justify-center text-white shrink-0">
-                      {showTerms === 'photographer' ? <Camera /> : showTerms === 'media' ? <Newspaper /> : <Users />}
-                   </div>
-                   <div>
-                      <span className="text-[10px] font-black uppercase text-gray-400">Accepting as</span>
-                      <h3 className="font-bold text-xl uppercase tracking-tighter">{showTerms} PORTAL</h3>
-                   </div>
-                </div>
-
-                <div className="space-y-6">
-                  {TERMS[showTerms].map((point, i) => (
-                    <div key={i} className="flex gap-4 group">
-                      <div className="w-6 h-6 rounded-full bg-red-100 text-[#E31E24] flex items-center justify-center text-[10px] font-black shrink-0 group-hover:bg-[#E31E24] group-hover:text-white transition-colors">
+              <div className="flex-1 p-12 overflow-y-auto custom-scrollbar bg-gray-50 border-b border-gray-100">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
+                   {TERMS[showTerms].map((point, i) => (
+                    <div key={i} className="flex gap-5 group">
+                      <div className="w-8 h-8 rounded-2xl bg-white border border-gray-200 text-[#E31E24] flex items-center justify-center text-[11px] font-black shrink-0 group-hover:bg-[#E31E24] group-hover:text-white transition-all shadow-sm">
                         {i + 1}
                       </div>
-                      <p className="text-sm text-gray-700 leading-relaxed font-medium">{point}</p>
+                      <p className="text-sm text-gray-700 leading-relaxed font-bold uppercase tracking-tight">{point}</p>
                     </div>
                   ))}
                 </div>
               </div>
 
-              <div className="p-10 bg-white space-y-6">
-                 <label className="flex items-start gap-4 cursor-pointer group">
-                   <div className={`mt-1 w-6 h-6 rounded-lg border-2 flex items-center justify-center transition-all shrink-0 ${hasAccepted ? 'bg-[#E31E24] border-[#E31E24]' : 'border-gray-200 group-hover:border-[#E31E24]'}`}>
+              <div className="p-12 bg-white flex flex-col gap-8">
+                 <label className="flex items-center gap-6 cursor-pointer group p-6 bg-gray-50 rounded-[2rem] border border-gray-100 hover:border-[#E31E24]/30 transition-all">
+                   <div className={`w-10 h-10 rounded-2xl border-4 flex items-center justify-center transition-all shrink-0 ${hasAccepted ? 'bg-[#E31E24] border-[#E31E24]' : 'border-gray-200 group-hover:border-[#E31E24]'}`}>
                       <input 
                         type="checkbox" 
                         className="hidden" 
                         checked={hasAccepted}
                         onChange={() => setHasAccepted(!hasAccepted)}
                       />
-                      {hasAccepted && <Check size={16} className="text-white" />}
+                      {hasAccepted && <Check size={24} className="text-white" />}
                    </div>
-                   <p className="text-[11px] text-gray-500 font-black uppercase tracking-widest leading-relaxed">
-                     I acknowledge that I have read and agree to all 15 protocol points for the {showTerms} portal. I understand my role in safeguarding the regional African image.
+                   <p className="text-xs text-gray-500 font-black uppercase tracking-widest leading-relaxed">
+                     I agree to the 99% revenue protocol and regional preservation terms.
                    </p>
                  </label>
 
                  <button 
                   disabled={!hasAccepted}
                   onClick={finalizeLogin}
-                  className={`w-full py-6 rounded-[2rem] font-black text-xs uppercase tracking-widest shadow-2xl transition-all ${hasAccepted ? 'bg-[#E31E24] text-white hover:bg-black' : 'bg-gray-100 text-gray-400 cursor-not-allowed'}`}
+                  className={`w-full py-8 rounded-[2.5rem] font-black text-sm uppercase tracking-[0.3em] shadow-2xl transition-all ${hasAccepted ? 'bg-[#E31E24] text-white hover:bg-black shadow-red-900/40' : 'bg-gray-100 text-gray-400 cursor-not-allowed'}`}
                  >
-                   Initialize Access <ArrowRight className="inline ml-2" size={16} />
+                   ACTIVATE SECTOR ACCESS <ArrowRight className="inline ml-4" size={20} />
                  </button>
               </div>
             </motion.div>
@@ -335,122 +344,45 @@ const LandingPage: React.FC<LandingPageProps> = ({ onLogin }) => {
         )}
       </AnimatePresence>
 
-      {/* --- CYCLING REASONS: COMPACT & VISIBLE --- */}
-      <section className="py-40 bg-white text-black relative overflow-hidden">
-        <div className="absolute inset-0 flex items-center justify-center opacity-5 pointer-events-none select-none overflow-hidden">
-          <span className="text-[25rem] font-embroidery-sketch whitespace-nowrap rotate-12">AUTHENTIC</span>
-        </div>
-
-        <div className="max-w-7xl mx-auto px-8 relative z-10">
-           <div className="text-center mb-24">
-              <h2 className="font-embroidery text-7xl md:text-[10rem] italic leading-[0.8] stitched-text mb-8">
-                30 REASONS <br/> <span className="text-[#E31E24]">TO JOIN</span>
-              </h2>
-              <div className="w-24 h-2 bg-[#E31E24] mx-auto rounded-full" />
+      <footer className="bg-black py-32 px-12 border-t border-white/5">
+        <div className="max-w-7xl mx-auto">
+           <div className="pt-12 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-8">
+              <span className="text-[9px] font-black text-gray-700 uppercase tracking-[0.8em]">© 2025 PICHA ZANGU PLC • RECLAIMING THE NARRATIVE</span>
+              <div className="flex items-center gap-4 text-[9px] font-black text-gray-700 uppercase tracking-widest">
+                 <div className="flex items-center gap-2"><div className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"/> SYSTEM STABLE</div>
+                 <span>SAT-LINK v4.2 ACTIVE</span>
+              </div>
            </div>
-
-           <div className="relative h-[550px] edge-fade overflow-hidden">
-             <div className="flex flex-col gap-4 animate-benefits-scroll">
-               {[...benefits, ...benefits].map((benefit, i) => (
-                 <motion.div 
-                   key={i}
-                   whileHover={{ scale: 1.02 }}
-                   className="group flex items-center gap-8 p-5 bg-gray-50 hover:bg-[#E31E24] hover:text-white rounded-[2.2rem] transition-all duration-500 border border-gray-100 shadow-md"
-                 >
-                   <div className="w-14 h-14 bg-white rounded-2xl flex items-center justify-center text-[#E31E24] shadow-md group-hover:rotate-6 transition-transform shrink-0">
-                     {React.isValidElement(benefit.icon) ? React.cloneElement(benefit.icon as React.ReactElement, { size: 24 }) : <Sparkles size={24} />}
-                   </div>
-                   <div className="flex-1">
-                     <h3 className="font-embroidery text-3xl mb-0.5 italic uppercase tracking-tighter leading-none">{benefit.title}</h3>
-                     <p className="text-xs opacity-70 font-black uppercase tracking-widest leading-none">{benefit.desc}</p>
-                   </div>
-                   <div className="opacity-0 group-hover:opacity-100 translate-x-4 group-hover:translate-x-0 transition-all">
-                     <ArrowRight size={28} />
-                   </div>
-                 </motion.div>
-               ))}
-             </div>
-           </div>
-        </div>
-      </section>
-
-      {/* --- FOOTER --- */}
-      <footer className="bg-black py-24 px-8 border-t border-white/5">
-        <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-end gap-16">
-          <div className="space-y-8">
-            <Logo size="md" className="grayscale opacity-50 hover:grayscale-0 hover:opacity-100 transition-all cursor-pointer" />
-            <div className="flex gap-8 text-[10px] font-black uppercase tracking-[0.4em] text-white/30">
-               {["Nairobi", "Kampala", "Dar Es Salaam", "Kigali"].map(city => (
-                 <span key={city} className="flex items-center gap-2">
-                    <div className="w-1 h-1 bg-[#E31E24] rounded-full" /> {city}
-                 </span>
-               ))}
-            </div>
-          </div>
-          <div className="flex flex-col items-end gap-8">
-             <div className="flex gap-10 text-[11px] font-black uppercase tracking-widest">
-                <a href="#" className="hover:text-[#E31E24] transition-colors">Press Room</a>
-                <a href="#" className="hover:text-[#E31E24] transition-colors">Investor Relations</a>
-                <a href="#" className="hover:text-[#E31E24] transition-colors">Privacy</a>
-             </div>
-             <p className="text-[9px] font-black text-white/20 uppercase tracking-[0.5em]">© 2025 Picha Zangu PLC • Built for Africa</p>
-          </div>
         </div>
       </footer>
 
-      <style>{`
-        @keyframes benefits-scroll {
-          0% { transform: translateY(0); }
-          100% { transform: translateY(-50%); }
-        }
-        .animate-benefits-scroll {
-          animation: benefits-scroll 35s linear infinite;
-        }
-        .animate-benefits-scroll:hover {
-          animation-play-state: paused;
-        }
-      `}</style>
     </div>
   );
 };
 
+const RoleCard = ({ icon, title, desc, onClick, accent = false }: any) => (
+  <button 
+    onClick={onClick}
+    className={`p-8 rounded-[2.5rem] text-left transition-all duration-500 border-2 overflow-hidden flex flex-col h-full hover:scale-[1.02] shadow-2xl ${accent ? 'bg-[#E31E24] border-[#E31E24] text-white' : 'bg-black/60 backdrop-blur-md border-white/10 text-white hover:border-[#E31E24]'}`}
+  >
+    <div className={`mb-6 w-16 h-16 rounded-[1.5rem] flex items-center justify-center transition-all ${accent ? 'bg-white text-[#E31E24]' : 'bg-[#E31E24] text-white'}`}>
+       {icon}
+    </div>
+    <h3 className="font-modern font-black text-2xl mb-2 tracking-tighter uppercase">{title}</h3>
+    <p className={`text-xs leading-relaxed font-bold uppercase tracking-tight ${accent ? 'text-white/80' : 'text-white/40'}`}>{desc}</p>
+    <div className="mt-8 flex items-center gap-2 text-[10px] font-black uppercase tracking-widest">
+      Login Now <ChevronRight size={14} />
+    </div>
+  </button>
+);
+
 const LandingNavLink = ({ to, icon, label }: { to: string, icon: any, label: string }) => (
   <Link 
     to={to} 
-    className="flex items-center gap-2 px-4 py-2 text-[9px] font-black uppercase tracking-widest text-white/40 hover:text-white transition-all"
+    className="flex items-center gap-2.5 px-5 py-2.5 text-[10px] font-black uppercase tracking-[0.3em] text-white/40 hover:text-white hover:bg-white/5 rounded-2xl transition-all"
   >
     {icon} {label}
   </Link>
-);
-
-const AppPortalCard = ({ icon, title, desc, cta, onClick, accent = false, delay = 0 }: any) => (
-  <motion.div 
-    initial={{ opacity: 0, y: 30 }}
-    whileInView={{ opacity: 1, y: 0 }}
-    transition={{ delay }}
-    viewport={{ once: true }}
-    onClick={onClick}
-    className={`group relative p-12 rounded-[4rem] cursor-pointer transition-all duration-500 border-2 overflow-hidden flex flex-col h-full ${accent ? 'bg-[#E31E24] border-[#E31E24] text-white' : 'glass-light border-white/10 text-white hover:border-white/30'}`}
-  >
-    <div className={`mb-10 w-20 h-20 rounded-3xl flex items-center justify-center transition-all ${accent ? 'bg-black text-white' : 'bg-[#E31E24] text-white group-hover:scale-110 shadow-lg'}`}>
-       {icon}
-    </div>
-    <h3 className="font-bungee text-3xl mb-4 tracking-tighter">{title}</h3>
-    <p className={`text-lg mb-12 leading-relaxed font-medium ${accent ? 'text-white/80' : 'text-white/50'}`}>{desc}</p>
-    
-    {/* Dedicated Login Button Style */}
-    <div className="mt-auto">
-      <button 
-        className={`w-full py-4 rounded-[1.5rem] font-black text-[10px] uppercase tracking-[0.2em] shadow-xl flex items-center justify-center gap-3 transition-all ${accent ? 'bg-white text-[#E31E24] hover:bg-black hover:text-white' : 'bg-[#E31E24] text-white hover:bg-white hover:text-black'}`}
-      >
-        {cta} <ArrowRight size={14} className="group-hover:translate-x-2 transition-transform" />
-      </button>
-    </div>
-
-    <div className="absolute top-0 right-0 p-10 opacity-[0.03] scale-[3] pointer-events-none">
-       {icon}
-    </div>
-  </motion.div>
 );
 
 export default LandingPage;

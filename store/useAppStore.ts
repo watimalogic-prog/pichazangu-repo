@@ -1,6 +1,39 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { Photo, CartItem, UserRole, UserProfile, Vault } from '../types';
+import { Photo, CartItem, UserRole, UserProfile, Vault, Gig, Bid, Currency } from '../types';
+import { MOCK_GIGS } from '../constants';
+
+/**
+ * CURRENCY & GEOLOCATION STORE
+ */
+interface CurrencyState {
+  currency: Currency;
+  exchangeRates: Record<Currency, number>; // Base: KES
+  setCurrency: (c: Currency) => void;
+  detectRegion: () => Promise<void>;
+}
+
+export const useCurrencyStore = create<CurrencyState>((set) => ({
+  currency: 'KES',
+  exchangeRates: {
+    KES: 1,
+    UGX: 28.5,
+    TZS: 20.1,
+    RWF: 9.8,
+    USD: 0.0078
+  },
+  setCurrency: (currency) => set({ currency }),
+  detectRegion: async () => {
+    if ("geolocation" in navigator) {
+      navigator.geolocation.getCurrentPosition((pos) => {
+        const { latitude } = pos.coords;
+        if (latitude > 0.3) set({ currency: 'UGX' });
+        else if (latitude < -4) set({ currency: 'TZS' });
+        else set({ currency: 'KES' });
+      });
+    }
+  }
+}));
 
 /**
  * THEME STORE
@@ -13,7 +46,7 @@ interface ThemeStore {
 export const useThemeStore = create<ThemeStore>()(
   persist(
     (set) => ({
-      theme: 'dark', // Default to dark for the "Industrial Embroidery" aesthetic
+      theme: 'dark',
       toggleTheme: () => set((state) => ({ 
         theme: state.theme === 'light' ? 'dark' : 'light' 
       })),
@@ -23,8 +56,33 @@ export const useThemeStore = create<ThemeStore>()(
 );
 
 /**
+ * GIG & OPPORTUNITY STORE
+ */
+interface GigStore {
+  gigs: Gig[];
+  bids: Bid[];
+  addGig: (gig: Gig) => void;
+  addBid: (bid: Bid) => void;
+  updateGigStatus: (id: string, status: Gig['status']) => void;
+}
+
+export const useGigStore = create<GigStore>()(
+  persist(
+    (set) => ({
+      gigs: MOCK_GIGS,
+      bids: [],
+      addGig: (gig) => set((state) => ({ gigs: [gig, ...state.gigs] })),
+      addBid: (bid) => set((state) => ({ bids: [...state.bids, bid] })),
+      updateGigStatus: (id, status) => set((state) => ({
+        gigs: state.gigs.map(g => g.id === id ? { ...g, status } : g)
+      })),
+    }),
+    { name: 'pichazangu-gigs' }
+  )
+);
+
+/**
  * VAULT STORE
- * Persists created vaults so they can be searched by clients.
  */
 interface VaultStore {
   vaults: Vault[];
@@ -48,29 +106,13 @@ export const useVaultStore = create<VaultStore>()(
           passkey: '882910',
           photoCount: 42,
           lastUpdated: '2024-05-21',
+          shootingDate: '2024-05-20',
+          location: 'Nairobi',
           isPublic: false,
           archiveStatus: 'Active',
           eventName: 'Nairobi Fashion Gala',
           price: 25000,
           status: 'locked'
-        },
-        {
-          id: 'v-public-1',
-          clientId: 'system',
-          clientName: 'Global Market',
-          clientEmail: '',
-          clientPhone: '',
-          clientAvatar: 'https://images.unsplash.com/photo-1547471080-7cc2caa01a7e?auto=format&fit=crop&w=100&q=80',
-          photographerId: 'ph1',
-          photographerName: 'Ali Command',
-          passkey: '',
-          photoCount: 890,
-          lastUpdated: '2024-05-22',
-          isPublic: true,
-          archiveStatus: 'Active',
-          eventName: 'Wildlife Sector',
-          price: 1500,
-          status: 'preview'
         }
       ],
       addVault: (vault) => set((state) => ({ vaults: [vault, ...state.vaults] })),
@@ -84,13 +126,14 @@ export const useVaultStore = create<VaultStore>()(
 
 /**
  * USER IDENTITY STORE
- * Manages the global session and profile data.
  */
 interface UserStore {
   user: UserProfile | null;
   login: (role: UserRole) => void;
   logout: () => void;
   updateTaxId: (id: string) => void;
+  updateBio: (bio: string) => void;
+  updateGear: (gear: string) => void;
 }
 
 export const useUserStore = create<UserStore>()(
@@ -106,7 +149,9 @@ export const useUserStore = create<UserStore>()(
             avatar: 'https://i.pravatar.cc/150?u=ali',
             location: 'Nairobi, Kenya',
             verified: true,
-            taxId: 'A001928374P'
+            taxId: 'A001928374P',
+            biography: 'Elite street and wildlife photographer based in Nairobi.',
+            photographyGear: 'Sony A7R V, 24-70mm f/2.8 GM II, 70-200mm f/2.8 GM OSS II'
           },
           client: {
             id: 'cl1',
@@ -128,14 +173,16 @@ export const useUserStore = create<UserStore>()(
           }
         };
         set({ user: mockProfiles[role] });
-        useToastStore.getState().showToast(`Authenticated as ${role.toUpperCase()}`, 'success');
       },
-      logout: () => {
-        set({ user: null });
-        useToastStore.getState().showToast("Logged out successfully", "info");
-      },
+      logout: () => set({ user: null }),
       updateTaxId: (taxId) => set((state) => ({
         user: state.user ? { ...state.user, taxId } : null
+      })),
+      updateBio: (biography) => set((state) => ({
+        user: state.user ? { ...state.user, biography } : null
+      })),
+      updateGear: (photographyGear) => set((state) => ({
+        user: state.user ? { ...state.user, photographyGear } : null
       }))
     }),
     { name: 'pichazangu-user' }
@@ -166,7 +213,7 @@ export const useMarketStore = create<MarketStore>((set) => ({
 }));
 
 /**
- * CART & SELECTION STORE
+ * CART STORE
  */
 interface CartStore {
   items: CartItem[];
@@ -181,15 +228,20 @@ export const useCartStore = create<CartStore>()(
     (set, get) => ({
       items: [],
       addItem: (photo, customPrice) => {
-        const platformFee = photo.category === 'Stock' ? 10 : 7;
+        // Protocol Service Fees:
+        // Private/Personal: 10 KES
+        // Public Stock: 20 KES
+        // Live Wire (Media): 50 KES
+        let platformFee = 20; 
+        if (photo.category === 'Media' || photo.category === 'News') platformFee = 50;
+        else if (photo.license === 'Personal') platformFee = 10;
+        
         const finalPrice = customPrice !== undefined ? customPrice : (photo.price + platformFee);
         const newItem: CartItem = { ...photo, discountedPrice: finalPrice };
         
-        if (!get().items.find(item => item.id === photo.id)) {
+        const existing = get().items.find(item => item.id === photo.id);
+        if (!existing) {
           set({ items: [...get().items, newItem] });
-          useToastStore.getState().showToast(`Added "${photo.title}" to selection`, 'success');
-        } else {
-          useToastStore.getState().showToast(`Already in your selection`, 'info');
         }
       },
       removeItem: (id) => set({ items: get().items.filter(item => item.id !== id) }),
@@ -201,10 +253,9 @@ export const useCartStore = create<CartStore>()(
 );
 
 /**
- * NOTIFICATION & TOAST STORE
+ * TOAST STORE
  */
 type ToastType = 'success' | 'error' | 'info';
-
 interface ToastStore {
   message: string | null;
   type: ToastType;

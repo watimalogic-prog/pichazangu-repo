@@ -1,41 +1,58 @@
-
 import React from 'react';
 
 interface VerificationBadgeProps {
   type?: 'photographer' | 'client' | 'media';
-  size?: number;
+  size?: 'sm' | 'md' | 'lg' | 'xl' | number;
+  className?: string;
 }
 
-const VerificationBadge: React.FC<VerificationBadgeProps> = ({ type = 'photographer', size = 24 }) => {
-  // Color Mapping for the three tiers
+const VerificationBadge: React.FC<VerificationBadgeProps> = ({ 
+  type = 'photographer', 
+  size = 'md',
+  className = ""
+}) => {
+  // Standardized Size Mapping
+  const sizeMap = {
+    sm: 14,
+    md: 20,
+    lg: 28,
+    xl: 40
+  };
+
+  const finalSize = typeof size === 'number' ? size : sizeMap[size] || sizeMap.md;
+
+  // Color Palette: High-Contrast Brand Tiers
   const colors = {
-    client: '#FF69B4',      // Pink: Linked Mobile Money & History
-    media: '#000000',       // Black: Verified Corporate Tax ID
-    photographer: '#E60000' // Red: Academy Grad or 50+ Sales
+    photographer: '#E63946', // Zangu Red
+    client: '#FF69B4',       // Client Pink
+    media: '#000000',        // Media Black
   };
 
   const badgeColor = colors[type] || colors.photographer;
 
   return (
     <svg 
-      width={size} 
-      height={size} 
+      width={finalSize} 
+      height={finalSize} 
       viewBox="0 0 100 100" 
       fill="none" 
       xmlns="http://www.w3.org/2000/svg"
-      className="inline-block align-middle ml-1"
-      aria-label={`${type} verified badge`}
+      className={`inline-block align-middle transition-transform duration-300 hover:scale-110 select-none ${className}`}
+      aria-label={`${type} verified identity`}
     >
-      {/* The 13-Point Sharp Rim Shape */}
+      {/* 12-Point Refined Seal Shape - High Geometric Fidelity */}
       <path 
-        d="M50 5L56.5 21.5L73.5 16.5L71 34L87.5 38.5L77.5 53L89.5 65.5L73.5 72L75.5 89.5L58.5 83.5L50 98L41.5 83.5L24.5 89.5L26.5 72L10.5 65.5L22.5 53L12.5 38.5L29 34L26.5 16.5L43.5 21.5L50 5Z" 
+        d="M50 2L58.2 16.5L74.1 11.2L74.8 28L91.1 32.3L83.8 47.5L93.7 61.2L78.6 68.8L77.9 85.6L61.4 82.2L50 94.6L38.6 82.2L22.1 85.6L21.4 68.8L6.3 61.2L16.2 47.5L8.9 32.3L25.2 28L25.9 11.2L41.8 16.5L50 2Z" 
         fill={badgeColor}
+        stroke={type === 'media' ? 'white' : 'none'}
+        strokeWidth={type === 'media' ? '2' : '0'}
       />
-      {/* The Checkmark */}
+      
+      {/* Standardized Checkmark - Clarity at all sizes */}
       <path 
-        d="M35 52L45 62L65 38" 
+        d="M32 52L44 64L68 36" 
         stroke="white" 
-        strokeWidth="8" 
+        strokeWidth="10" 
         strokeLinecap="round" 
         strokeLinejoin="round" 
       />

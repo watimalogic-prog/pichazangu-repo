@@ -1,20 +1,21 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Briefcase, MapPin, Calendar, Plus, Filter, Search, 
   ChevronRight, Star, ShieldCheck, Zap, ArrowRight, 
   Info, MessageSquare, DollarSign, Camera, CheckCircle,
-  Clock, Award, LayoutGrid, List, X, Map as MapIcon,
-  Navigation as NavigationIcon, Sparkles, Send, PlusCircle,
-  FileText, User, ChevronLeft, Loader2
+  Clock, Award, LayoutGrid, List, X, 
+  PlusCircle, FileText, User, ChevronLeft, Loader2,
+  Smartphone, Send, Target, Users, Map as MapIcon,
+  Trophy, Heart, ExternalLink
 } from 'lucide-react';
-import { MOCK_GIGS, MOCK_BIDS, CURRENCY_SYMBOLS, COLORS } from '../constants';
+import { CURRENCY_SYMBOLS } from '../constants';
 import { UserRole, Gig, Bid } from '../types';
-import { useUserStore, useToastStore } from '../store/useAppStore';
+import { useUserStore, useToastStore, useGigStore } from '../store/useAppStore';
 
 const Gigz: React.FC = () => {
   const { user } = useUserStore();
-  const userRole = user?.role || 'client';
+  const { gigs, addGig, bids } = useGigStore();
   const showToast = useToastStore((state) => state.showToast);
 
   const [activeTab, setActiveTab] = useState<'find' | 'my-gigs' | 'history'>('find');
@@ -24,47 +25,63 @@ const Gigz: React.FC = () => {
   const [categoryFilter, setCategoryFilter] = useState('All');
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
 
-  // Filter Logic
-  const filteredGigs = MOCK_GIGS.filter(gig => {
-    const matchesSearch = gig.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
-                          gig.location.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesCategory = categoryFilter === 'All' || gig.category === categoryFilter;
-    return matchesSearch && matchesCategory;
-  });
+  // Logic: Filter gigs based on active tab and search/category criteria
+  const filteredGigs = useMemo(() => {
+    let list = [...gigs];
+    
+    // Tab filtering
+    if (activeTab === 'find') {
+      list = list.filter(g => g.status === 'Open');
+    } else if (activeTab === 'my-gigs') {
+      // Show gigs the current user posted
+      list = list.filter(g => g.postedBy === user?.name);
+    } else if (activeTab === 'history') {
+      list = list.filter(g => g.status === 'Completed' || g.status === 'Booked');
+    }
+
+    // Search and Category filtering
+    return list.filter(gig => {
+      const matchesSearch = gig.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
+                            gig.location.toLowerCase().includes(searchQuery.toLowerCase());
+      const matchesCategory = categoryFilter === 'All' || gig.category === categoryFilter;
+      return matchesSearch && matchesCategory;
+    });
+  }, [gigs, activeTab, searchQuery, categoryFilter, user?.name]);
 
   return (
     <div className="min-h-screen pb-20 space-y-10 animate-in fade-in duration-500 pt-20">
+      
       {/* 1. DYNAMIC HEADER */}
       <header className="flex flex-col md:flex-row items-center justify-between gap-6 px-4 md:px-0">
         <div>
           <div className="flex items-center gap-2 mb-2">
-            <Briefcase className="text-red-600" size={20} />
-            <span className="text-[10px] font-black text-red-600 uppercase tracking-widest">Opportunity Network</span>
+            <div className="w-2 h-2 bg-red-600 rounded-full animate-ping" />
+            <span className="text-[10px] font-black text-red-600 uppercase tracking-widest">Global Opportunity Feed</span>
           </div>
           <h1 className="font-embroidery text-6xl text-white leading-none">
             GIGS & <span className="font-embroidery-sketch text-red-600">PROPOSALS</span>
           </h1>
-          <p className="text-gray-400 text-sm mt-2 font-medium">East Africa's premier portal for custom photography commissions.</p>
+          <p className="text-gray-400 text-sm mt-2 font-medium">Connect with East Africa's elite creators for unique assignments.</p>
         </div>
 
-        {userRole !== 'photographer' && (
+        {user?.role !== 'photographer' && (
           <button 
             onClick={() => setShowWizard(true)}
             className="group relative bg-red-600 text-white px-10 py-5 rounded-[2rem] font-black text-xs uppercase tracking-widest shadow-2xl hover:bg-white hover:text-red-600 transition-all flex items-center gap-3"
           >
-            <Plus size={20} /> Post New Gig
+            <Plus size={20} /> Commission a Pro
             <div className="absolute inset-x-10 bottom-2 h-[1px] border-b border-dashed border-white/30" />
           </button>
         )}
       </header>
 
       {/* 2. NAVIGATION & SEARCH BAR */}
-      <div className="sticky top-20 z-40 space-y-6 bg-black/80 backdrop-blur-xl py-4 -mx-4 px-4 md:-mx-0 md:px-0 border-b border-white/5">
+      <div className="sticky top-16 md:top-20 z-40 space-y-6 bg-black/80 backdrop-blur-xl py-4 -mx-4 px-4 md:-mx-0 md:px-0 border-b border-white/5">
         <div className="flex flex-wrap items-center justify-between gap-6">
-          <div className="flex bg-white/5 p-2 rounded-[1.8rem] border border-white/10 shadow-sm">
-            <NavBtn active={activeTab === 'find'} label="Find Gigs" onClick={() => setActiveTab('find')} />
-            {userRole !== 'photographer' && <NavBtn active={activeTab === 'my-gigs'} label="My Posted Gigs" onClick={() => setActiveTab('my-gigs')} />}
-            <NavBtn active={activeTab === 'history'} label="History" onClick={() => setActiveTab('history')} />
+          <div className="flex bg-white/5 p-2 rounded-[1.8rem] border border-white/10 shadow-sm overflow-x-auto scrollbar-hide max-w-full">
+            <NavBtn active={activeTab === 'find'} label="Explore Feed" onClick={() => setActiveTab('find')} />
+            {user?.role === 'client' && <NavBtn active={activeTab === 'my-gigs'} label="My Commissions" onClick={() => setActiveTab('my-gigs')} />}
+            <NavBtn active={activeTab === 'history'} label="Archive" onClick={() => setActiveTab('history')} />
           </div>
 
           <div className="flex items-center gap-4 w-full md:w-auto">
@@ -73,14 +90,11 @@ const Gigz: React.FC = () => {
                 <input 
                   type="text" 
                   placeholder="Location or keywords..."
-                  className="w-full pl-12 pr-4 py-3 bg-white/5 border border-white/10 rounded-2xl outline-none focus:ring-2 focus:ring-red-600/10 focus:border-red-600/50 transition-all text-sm font-medium text-white"
+                  className="w-full pl-12 pr-4 py-3 bg-white/5 border border-white/10 rounded-2xl outline-none focus:ring-2 focus:ring-red-600/10 focus:border-red-600/50 transition-all text-sm font-medium text-white uppercase tracking-widest"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                 />
              </div>
-             <button className="p-3 bg-white/5 border border-white/10 rounded-2xl text-gray-400 hover:text-red-600 transition-colors shadow-sm">
-               <Filter size={20} />
-             </button>
              <div className="hidden sm:flex bg-white/5 border border-white/10 rounded-2xl p-1 shadow-sm">
                 <button onClick={() => setViewMode('grid')} className={`p-2 rounded-xl transition-all ${viewMode === 'grid' ? 'bg-red-600 text-white' : 'text-gray-400'}`}><LayoutGrid size={18}/></button>
                 <button onClick={() => setViewMode('list')} className={`p-2 rounded-xl transition-all ${viewMode === 'list' ? 'bg-red-600 text-white' : 'text-gray-400'}`}><List size={18}/></button>
@@ -88,7 +102,6 @@ const Gigz: React.FC = () => {
           </div>
         </div>
 
-        {/* Quick Filters */}
         <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
           {['All', 'Wedding', 'News', 'Sports', 'Fashion', 'Corporate'].map(cat => (
             <button 
@@ -104,7 +117,7 @@ const Gigz: React.FC = () => {
 
       {/* 3. MAIN GIGS FEED */}
       <main className="px-4 md:px-0">
-        {activeTab === 'find' && (
+        {filteredGigs.length > 0 ? (
           <div className={viewMode === 'grid' ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8' : 'flex flex-col gap-6'}>
             {filteredGigs.map((gig) => (
               <GigCard 
@@ -115,76 +128,54 @@ const Gigz: React.FC = () => {
               />
             ))}
           </div>
-        )}
-        
-        {activeTab === 'my-gigs' && (
-          <div className="flex flex-col gap-6">
-             {MOCK_GIGS.filter(g => g.postedBy.includes(user?.name || '')).length === 0 ? (
-               <div className="py-20 text-center bg-white/5 rounded-[3rem] border-2 border-dashed border-white/10">
-                  <Briefcase size={48} className="mx-auto mb-4 text-gray-700" />
-                  <p className="text-gray-500 font-bold uppercase tracking-widest text-xs">You haven't posted any gigs yet.</p>
-                  <button onClick={() => setShowWizard(true)} className="mt-6 text-red-600 font-black uppercase text-[10px] tracking-widest hover:underline">Post Your First Gig</button>
-               </div>
-             ) : (
-               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  {MOCK_GIGS.filter(g => g.postedBy.includes(user?.name || '')).map(gig => (
-                    <GigCard key={gig.id} gig={gig} viewMode="grid" onClick={() => setSelectedGig(gig)} />
-                  ))}
-               </div>
-             )}
-          </div>
-        )}
-
-        {activeTab === 'history' && (
-          <div className="py-20 text-center text-gray-500">
-             <Clock size={48} className="mx-auto mb-4 opacity-20" />
-             <p className="font-black text-xs uppercase tracking-widest">No completed gigs in your history.</p>
+        ) : (
+          <div className="py-32 text-center bg-white/5 rounded-[4rem] border-2 border-dashed border-white/10">
+             <Briefcase size={64} className="mx-auto mb-6 text-gray-800 opacity-20" />
+             <h3 className="text-xl font-black text-gray-500 uppercase tracking-widest">No active nodes found</h3>
+             <p className="text-gray-600 text-xs font-bold uppercase mt-2">Adjust your filters or query to expand search.</p>
           </div>
         )}
       </main>
 
-      {/* 4. MODALS: DETAIL & WIZARD */}
       <AnimatePresence>
         {selectedGig && (
           <GigDetailModal 
             gig={selectedGig} 
-            userRole={userRole} 
+            userRole={user?.role || 'client'} 
             onClose={() => setSelectedGig(null)} 
           />
         )}
         {showWizard && (
           <PostGigWizard 
             onClose={() => setShowWizard(false)} 
+            onGigAdded={(g) => { addGig(g); showToast("Commission Node Live", "success"); }}
           />
         )}
       </AnimatePresence>
 
-      {/* 5. GIG LEADERBOARD MINI-PANEL */}
+      {/* 5. SECTOR LEADERS */}
       <section className="mt-20 p-12 bg-[#0a0a0a] border border-white/5 rounded-[3.5rem] text-white relative overflow-hidden group mx-4 md:mx-0">
          <div className="relative z-10 grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
             <div>
                <div className="flex items-center gap-2 mb-4">
                  <Award className="text-red-600" size={24} />
-                 <span className="text-red-600 text-[10px] font-black uppercase tracking-[0.3em]">Leaderboard</span>
+                 <span className="text-red-600 text-[10px] font-black uppercase tracking-[0.3em]">Hiring Authority</span>
                </div>
                <h2 className="font-embroidery text-5xl italic leading-none mb-6">MOST HIRED <br/><span className="text-red-600 font-embroidery-sketch">THIS MONTH</span></h2>
-               <p className="text-gray-400 text-sm max-w-md leading-relaxed mb-10">Meet the professionals consistently delivering high-quality assets across East Africa.</p>
-               
                <div className="space-y-4">
                   {[1,2,3].map(i => (
-                    <div key={i} className="flex items-center justify-between p-4 bg-white/5 rounded-2xl border border-white/5 group-hover:bg-white/10 transition-all">
+                    <div key={i} className="flex items-center justify-between p-4 bg-white/5 rounded-2xl border border-white/5 hover:bg-white/10 transition-all cursor-pointer group/item">
                        <div className="flex items-center gap-4">
                           <span className="font-bungee text-red-600">#{i}</span>
-                          <div className="w-10 h-10 rounded-full bg-gray-800" />
+                          <div className="w-10 h-10 rounded-full bg-gray-800 border border-white/10 overflow-hidden">
+                             <img src={`https://i.pravatar.cc/100?u=hired-${i}`} className="w-full h-full object-cover" alt="" />
+                          </div>
                           <div>
                              <span className="block font-bold">Ali Studio</span>
-                             <span className="text-[10px] text-gray-500 uppercase tracking-widest">Nairobi • 4.9 <Star size={10} className="inline fill-current"/></span>
+                             <span className="text-[10px] text-gray-500 uppercase tracking-widest">4.9 <Star size={10} className="inline fill-current text-red-600"/> • Nairobi</span>
                           </div>
                        </div>
-                       <div className="text-right">
-                          <span className="block font-bungee text-red-600">14 GIGS</span>
-                          <span className="text-[10px] text-gray-500 uppercase">Booked</span>
-                       </div>
+                       <button className="bg-red-600 text-white p-2 rounded-lg group-hover/item:bg-white group-hover/item:text-red-600 transition-colors"><ChevronRight size={14}/></button>
                     </div>
                   ))}
                </div>
@@ -192,14 +183,12 @@ const Gigz: React.FC = () => {
 
             <div className="bg-white/5 backdrop-blur-md border border-white/10 rounded-[3rem] p-10 relative overflow-hidden">
                <Zap className="text-red-600 mb-6 animate-pulse" size={40} />
-               <h3 className="font-embroidery text-4xl mb-4 italic">INSTANT <br/>RECRUITMENT</h3>
-               <p className="text-gray-400 text-sm leading-relaxed mb-8">Verified Pros can be hired in one click without the bidding process. Direct access to elite talent.</p>
-               <button className="w-full bg-red-600 text-white font-black py-4 rounded-2xl shadow-xl shadow-red-900/40 hover:bg-white hover:text-red-600 transition-all text-[10px] uppercase tracking-widest">
-                 Browse Top Talent
+               <h3 className="font-embroidery text-4xl mb-4 italic">INSTANT <br/>HIRING</h3>
+               <p className="text-gray-400 text-sm leading-relaxed mb-8">Verified Pros can be hired immediately without bidding. Escrow payments apply.</p>
+               <button onClick={() => showToast("Direct Hire Terminal Initializing...", "info")} className="w-full bg-red-600 text-white font-black py-4 rounded-2xl shadow-xl hover:bg-white hover:text-red-600 transition-all text-[10px] uppercase tracking-widest">
+                 RECRUIT VERIFIED TALENT
                </button>
-               <div className="absolute top-0 right-0 p-10 opacity-5 -rotate-12 translate-x-10">
-                  <ShieldCheck size={200} />
-               </div>
+               <ShieldCheck size={200} className="absolute -right-10 -top-10 opacity-5 -rotate-12" />
             </div>
          </div>
       </section>
@@ -209,55 +198,20 @@ const Gigz: React.FC = () => {
 
 // --- SUBCOMPONENTS ---
 
-interface GigCardProps {
-  gig: Gig;
-  viewMode: 'grid' | 'list';
-  onClick: () => void;
-}
-
-const GigCard: React.FC<GigCardProps> = ({ gig, viewMode, onClick }) => {
+const GigCard: React.FC<{ gig: Gig, viewMode: 'grid' | 'list', onClick: () => void }> = ({ gig, viewMode, onClick }) => {
   const isFlash = gig.urgency === 'Flash';
-
-  if (viewMode === 'list') {
-    return (
-      <motion.div 
-        layout
-        onClick={onClick}
-        className={`flex flex-col md:flex-row items-center gap-6 p-6 bg-[#111] border border-white/5 rounded-[2rem] shadow-sm hover:shadow-xl transition-all cursor-pointer group ${isFlash ? 'border-l-8 border-red-600' : ''}`}
-      >
-        <div className="w-full md:w-32 aspect-square rounded-2xl overflow-hidden bg-black shrink-0 relative">
-           <div className="absolute inset-0 bg-red-600/5 flex items-center justify-center">
-              <Camera className="text-red-600/20" size={40} />
-           </div>
-           {isFlash && <div className="absolute inset-0 bg-red-600/10 animate-pulse" />}
-        </div>
-        
-        <div className="flex-1 min-w-0">
-           <div className="flex items-center gap-3 mb-1">
-              <span className="text-[10px] font-black text-red-600 uppercase tracking-widest">{gig.category}</span>
-              <span className="w-1 h-1 bg-white/10 rounded-full" />
-              <span className="text-[10px] font-black text-gray-500 uppercase tracking-widest">{gig.location}</span>
-           </div>
-           <h3 className="text-xl font-bold text-white truncate group-hover:text-red-600 transition-colors">{gig.title}</h3>
-           <p className="text-gray-500 text-sm mt-1 line-clamp-1">{gig.description}</p>
-        </div>
-
-        <div className="flex flex-col items-end gap-2 shrink-0">
-           <span className="text-xl font-bungee text-white">
-             {CURRENCY_SYMBOLS[gig.currency]} {gig.budgetMin.toLocaleString()}
-           </span>
-           <button className="bg-white/5 text-gray-400 group-hover:bg-red-600 group-hover:text-white px-6 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all">View</button>
-        </div>
-      </motion.div>
-    );
-  }
+  const { bids } = useGigStore();
+  const bidCount = bids.filter(b => b.gigId === gig.id).length;
+  
+  // Simulation: Distance from current node
+  const distance = useMemo(() => (Math.random() * 15 + 1).toFixed(1), [gig.id]);
 
   return (
     <motion.div 
       layout
       whileHover={{ y: -8 }}
       onClick={onClick}
-      className={`bg-[#111] rounded-[2.5rem] border border-white/5 shadow-sm overflow-hidden hover:shadow-2xl transition-all cursor-pointer group flex flex-col h-full ${isFlash ? 'ring-2 ring-red-600' : ''}`}
+      className={`bg-[#111] rounded-[2.5rem] border border-white/5 shadow-sm overflow-hidden hover:border-red-600/30 transition-all cursor-pointer group flex flex-col h-full ${isFlash ? 'ring-2 ring-red-600' : ''}`}
     >
       <div className="p-8 pb-4 flex-1 flex flex-col">
         <div className="flex justify-between items-start mb-6">
@@ -265,227 +219,298 @@ const GigCard: React.FC<GigCardProps> = ({ gig, viewMode, onClick }) => {
               {isFlash ? <Zap size={24}/> : <Camera size={24}/>}
            </div>
            <div className="text-right">
-              <span className="block text-[8px] font-black text-gray-500 uppercase tracking-[0.2em] mb-1">Max Budget</span>
-              <span className="font-bungee text-lg text-white leading-none">
-                 {CURRENCY_SYMBOLS[gig.currency]} {gig.budgetMax.toLocaleString()}
+              <span className="block text-[8px] font-black text-gray-500 uppercase tracking-widest mb-1">Max Budget</span>
+              <span className="font-bungee text-xl text-white leading-none">
+                 KES {gig.budgetMax.toLocaleString()}
               </span>
            </div>
         </div>
 
         <div className="mb-6">
-           <span className="text-[10px] font-black text-red-600 uppercase tracking-[0.2em] block mb-1">{gig.category}</span>
+           <div className="flex items-center gap-2 mb-1">
+             <span className="text-[10px] font-black text-red-600 uppercase tracking-widest">{gig.category}</span>
+             <span className={`text-[10px] font-bold uppercase ${gig.status === 'Booked' ? 'text-green-500' : 'text-gray-600'}`}>• {gig.status}</span>
+           </div>
            <h3 className="text-xl font-bold text-white group-hover:text-red-600 transition-colors leading-tight line-clamp-2">{gig.title}</h3>
         </div>
-
-        <p className="text-gray-500 text-sm leading-relaxed mb-8 line-clamp-3 font-medium">
-          {gig.description}
-        </p>
 
         <div className="space-y-3 mt-auto mb-4">
            <div className="flex items-center gap-3 text-gray-400">
               <MapPin size={16} className="text-red-600" />
-              <span className="text-[10px] font-black uppercase tracking-widest">{gig.location}</span>
+              <div className="flex flex-col">
+                <span className="text-[9px] font-black uppercase tracking-widest">{gig.location}</span>
+                <span className="text-[8px] text-gray-600 font-bold uppercase tracking-widest">{distance} KM FROM YOUR NODE</span>
+              </div>
            </div>
            <div className="flex items-center gap-3 text-gray-400">
               <Clock size={16} className="text-red-600" />
-              <span className="text-[10px] font-black uppercase tracking-widest">Deadline: {gig.deadline}</span>
+              <span className="text-[9px] font-black uppercase tracking-widest">Deadline: {gig.deadline}</span>
            </div>
         </div>
       </div>
 
       <div className="p-8 pt-0 flex gap-2">
-         <button className="flex-1 bg-white/5 hover:bg-red-600 hover:text-white text-gray-400 font-black py-4 rounded-2xl transition-all text-[10px] uppercase tracking-widest flex items-center justify-center gap-2 border border-white/5">
-            View Details <Info size={14}/>
-         </button>
+         <div className="flex-1 bg-white/5 px-4 py-4 rounded-2xl flex items-center justify-between group-hover:bg-white transition-all">
+            <span className="text-[10px] font-black uppercase text-gray-500 group-hover:text-black">Active Bids</span>
+            <span className="font-bungee text-red-600">{bidCount}</span>
+         </div>
       </div>
     </motion.div>
   );
 };
 
 const GigDetailModal = ({ gig, userRole, onClose }: { gig: Gig, userRole: UserRole, onClose: any }) => {
+  const { user } = useUserStore();
+  const { addBid, bids, updateGigStatus } = useGigStore();
   const [pitch, setPitch] = useState('');
   const [quote, setQuote] = useState(gig.budgetMin);
   const [isSuccess, setIsSuccess] = useState(false);
-  const { user } = useUserStore();
+  const [isHiring, setIsHiring] = useState(false);
+  const [activeBidDetail, setActiveBidDetail] = useState<Bid | null>(null);
+  const showToast = useToastStore(s => s.showToast);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const gigBids = bids.filter(b => b.gigId === gig.id);
+  const isMyGig = gig.postedBy === user?.name;
+  const alreadyBid = bids.some(b => b.gigId === gig.id && b.photographerId === user?.id);
+
+  const handleSubmitProposal = (e: React.FormEvent) => {
     e.preventDefault();
+    if (alreadyBid) {
+      showToast("You have already submitted a bid for this node.", "error");
+      return;
+    }
+    const bid: Bid = {
+      id: `bid-${Date.now()}`,
+      gigId: gig.id,
+      photographerId: user?.id || 'anon',
+      photographerName: user?.name || 'Anonymous Pro',
+      photographerRating: 5.0,
+      pitch,
+      quote,
+      status: 'Pending',
+      portfolioUrl: '#'
+    };
+    addBid(bid);
     setIsSuccess(true);
+    showToast("Proposal Transmitted Successfully", "success");
     setTimeout(onClose, 2000);
   };
 
-  const isMyGig = gig.postedBy.includes(user?.name || '');
+  const handleHire = (bid: Bid) => {
+    setIsHiring(true);
+    showToast(`Authorizing Escrow release to ${bid.photographerName}...`, "info");
+    
+    // Simulate smart contract locking
+    setTimeout(() => {
+      updateGigStatus(gig.id, 'Booked');
+      setIsHiring(false);
+      showToast("Talent Booked. Project Hub Active.", "success");
+      onClose();
+    }, 2500);
+  };
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-black/80 backdrop-blur-md">
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-6 bg-black/80 backdrop-blur-md">
       <motion.div 
         initial={{ scale: 0.9, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         exit={{ scale: 0.9, opacity: 0 }}
         className="bg-white rounded-[4rem] shadow-2xl overflow-hidden max-w-5xl w-full flex flex-col md:flex-row max-h-[90vh]"
       >
-        {/* Left Info Panel */}
-        <div className="w-full md:w-[40%] bg-gray-900 p-12 text-white flex flex-col overflow-y-auto custom-scrollbar">
-           <div className="flex justify-between items-start mb-8">
-              <div className={`p-4 rounded-2xl ${gig.urgency === 'Flash' ? 'bg-red-600' : 'bg-white/10'}`}>
-                {gig.urgency === 'Flash' ? <Zap size={32}/> : <Briefcase size={32}/>}
-              </div>
-              <span className="text-red-500 font-bungee text-2xl">
-                 {CURRENCY_SYMBOLS[gig.currency]} {gig.budgetMax.toLocaleString()}
-              </span>
+        {/* LEFT PANEL: JOB DETAILS */}
+        <div className="w-full md:w-[40%] bg-gray-900 p-8 md:p-12 text-white flex flex-col overflow-y-auto custom-scrollbar">
+           <button onClick={onClose} className="mb-10 text-gray-500 hover:text-white flex items-center gap-2 text-[10px] font-black uppercase tracking-widest transition-all"><ChevronLeft size={16}/> Back to feed</button>
+           
+           <div className="mb-8">
+              <span className="text-red-500 text-[10px] font-black uppercase tracking-[0.4em] mb-2 block">{gig.category} MISSION</span>
+              <h2 className="font-embroidery text-5xl italic leading-none">{gig.title}</h2>
            </div>
 
-           <h2 className="font-embroidery text-5xl mb-6 italic leading-tight">{gig.title}</h2>
-           
            <div className="space-y-6 flex-1">
-              <div className="bg-white/5 p-6 rounded-[2rem] border border-white/5">
-                 <h4 className="text-[10px] font-black uppercase text-gray-500 tracking-[0.2em] mb-4">Requirements</h4>
-                 <div className="flex flex-wrap gap-2">
-                    {gig.requirements.map(req => (
-                      <span key={req} className="px-4 py-2 bg-red-600 text-white text-[10px] font-black uppercase rounded-xl shadow-lg shadow-red-900/40">{req}</span>
-                    ))}
-                 </div>
+              <div className="p-6 bg-white/5 rounded-3xl border border-white/10">
+                 <h4 className="text-[10px] font-black uppercase text-gray-500 mb-4 tracking-widest">Job Narrative</h4>
+                 <p className="text-gray-400 text-sm leading-relaxed">{gig.description}</p>
               </div>
-
               <div className="space-y-4">
-                 <div className="flex items-center gap-4">
-                    <MapPin className="text-red-600" size={20} />
-                    <div>
-                       <span className="block text-[8px] font-black text-gray-500 uppercase">Location</span>
-                       <span className="text-sm font-bold">{gig.location}</span>
-                    </div>
-                 </div>
-                 <div className="flex items-center gap-4">
-                    <Calendar className="text-red-600" size={20} />
-                    <div>
-                       <span className="block text-[8px] font-black text-gray-500 uppercase">Event Date</span>
-                       <span className="text-sm font-bold">{gig.deadline}</span>
-                    </div>
-                 </div>
-                 <div className="flex items-center gap-4">
-                    <User className="text-red-600" size={20} />
-                    <div>
-                       <span className="block text-[8px] font-black text-gray-500 uppercase">Posted By</span>
-                       <span className="text-sm font-bold">{gig.postedBy}</span>
-                    </div>
-                 </div>
+                 <DetailItem icon={<MapPin size={18}/>} label="Location" val={gig.location} />
+                 <DetailItem icon={<Calendar size={18}/>} label="Shoot Date" val={gig.deadline} />
+                 <DetailItem icon={<DollarSign size={18}/>} label="Budget Limit" val={`KES ${gig.budgetMax.toLocaleString()}`} />
               </div>
+           </div>
 
-              <div className="pt-8 border-t border-white/5 flex items-center gap-4">
-                 <ShieldCheck className="text-green-500" size={24} />
-                 <p className="text-[10px] font-bold text-gray-400 leading-relaxed uppercase">
-                    Escrow Protection Enabled: Your funds are held by Picha Zangu until files are delivered.
-                 </p>
+           <div className="mt-10 p-6 bg-red-600/10 rounded-2xl border border-red-600/20">
+              <div className="flex items-center gap-3 mb-2">
+                 <ShieldCheck size={20} className="text-red-600" />
+                 <span className="text-[10px] font-black uppercase text-red-600">Secure Escrow</span>
               </div>
+              <p className="text-[9px] font-bold text-gray-400 uppercase leading-relaxed">Picha Zangu holds the funds in a secure node until you confirm the delivery of high-res assets.</p>
            </div>
         </div>
 
-        {/* Right Bidding Panel / Management Panel */}
-        <div className="flex-1 p-12 flex flex-col bg-white overflow-y-auto custom-scrollbar text-black">
+        {/* RIGHT PANEL: ACTIONS / BIDS */}
+        <div className="flex-1 p-8 md:p-12 flex flex-col bg-white text-black overflow-y-auto custom-scrollbar relative">
            <div className="flex justify-between items-center mb-10">
               <h3 className="font-embroidery text-4xl text-gray-900 italic">
-                {isMyGig ? 'MANAGE GIG' : userRole === 'photographer' ? 'SUBMIT PROPOSAL' : 'GIG DETAILS'}
+                {isMyGig ? 'PROPOSALS' : userRole === 'photographer' ? 'SEND PITCH' : 'CLIENT VIEW'}
               </h3>
-              <button onClick={onClose} className="p-3 bg-gray-50 rounded-full hover:bg-gray-100"><X size={20}/></button>
+              <button onClick={onClose} className="p-3 bg-gray-50 rounded-full hover:bg-gray-100 transition-colors"><X size={20}/></button>
            </div>
 
+           {/* IF CLIENT REVIEWING THEIR OWN GIG */}
            {isMyGig ? (
              <div className="space-y-8">
-                <div className="p-8 bg-gray-50 rounded-[2.5rem] border border-gray-100">
-                   <h4 className="font-black text-xs uppercase tracking-widest text-gray-400 mb-6">Bids Received (8)</h4>
-                   <div className="space-y-4">
-                      {[1,2].map(i => (
-                        <div key={i} className="flex items-center justify-between p-4 bg-white rounded-2xl border border-gray-100 shadow-sm">
-                           <div className="flex items-center gap-4">
-                              <div className="w-12 h-12 bg-gray-200 rounded-xl" />
-                              <div>
-                                 <span className="block font-bold">Ali Studio</span>
-                                 <span className="text-[10px] text-gray-400 uppercase">4.9 Star Pro</span>
+                <AnimatePresence mode="wait">
+                   {activeBidDetail ? (
+                     <motion.div 
+                        key="bid-detail"
+                        initial={{ opacity: 0, x: 20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        exit={{ opacity: 0, x: -20 }}
+                        className="space-y-8"
+                     >
+                        <button onClick={() => setActiveBidDetail(null)} className="text-red-600 font-black text-[10px] uppercase tracking-widest flex items-center gap-2 mb-6"><ChevronLeft size={16}/> Back to list</button>
+                        <div className="flex items-center gap-6 mb-8">
+                           <div className="w-20 h-20 bg-gray-100 rounded-3xl overflow-hidden border border-gray-100">
+                              <img src={`https://i.pravatar.cc/150?u=${activeBidDetail.photographerId}`} className="w-full h-full object-cover" alt="" />
+                           </div>
+                           <div>
+                              <h4 className="text-3xl font-black uppercase tracking-tighter">{activeBidDetail.photographerName}</h4>
+                              <div className="flex items-center gap-2 mt-1">
+                                 <Star size={14} className="text-yellow-500 fill-current" />
+                                 <span className="font-bold text-sm">{activeBidDetail.photographerRating} Rating</span>
                               </div>
                            </div>
-                           <div className="text-right">
-                              <span className="block font-bungee text-red-600">KES 18,000</span>
-                              <button className="text-[10px] font-black text-red-600 uppercase underline">Review Pitch</button>
-                           </div>
                         </div>
-                      ))}
-                   </div>
-                </div>
-                <button className="w-full py-5 bg-black text-white rounded-2xl font-black text-xs uppercase tracking-widest">Close Bidding</button>
+
+                        <div className="bg-gray-50 p-8 rounded-[2.5rem] border border-gray-100">
+                           <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest block mb-4">Photographer's Pitch</span>
+                           <p className="text-lg font-medium leading-relaxed italic">"{activeBidDetail.pitch}"</p>
+                        </div>
+
+                        <div className="flex items-center justify-between p-8 bg-black text-white rounded-[2.5rem]">
+                           <div>
+                              <span className="text-[10px] font-black text-gray-500 uppercase tracking-widest block mb-1">Quoted Price</span>
+                              <span className="text-4xl font-bungee text-red-600">KES {activeBidDetail.quote.toLocaleString()}</span>
+                           </div>
+                           <button 
+                            onClick={() => handleHire(activeBidDetail)}
+                            className="bg-red-600 hover:bg-white hover:text-black text-white px-10 py-5 rounded-[1.8rem] font-black text-xs uppercase tracking-[0.2em] transition-all shadow-xl"
+                           >
+                              HIRE NOW
+                           </button>
+                        </div>
+                     </motion.div>
+                   ) : (
+                     <div className="space-y-4">
+                        {gigBids.length === 0 ? (
+                          <div className="py-20 text-center text-gray-300 uppercase">
+                             <Users size={48} className="mx-auto mb-4 opacity-10" />
+                             <p className="text-[10px] font-black tracking-[0.4em]">No bids received for this node yet.</p>
+                          </div>
+                        ) : (
+                          gigBids.map(bid => (
+                            <div key={bid.id} className="p-6 bg-gray-50 border border-gray-100 rounded-[2rem] flex items-center justify-between group hover:border-red-600/20 transition-all">
+                               <div className="flex items-center gap-6">
+                                  <div className="w-14 h-14 bg-gray-200 rounded-2xl overflow-hidden">
+                                    <img src={`https://i.pravatar.cc/100?u=${bid.photographerId}`} className="w-full h-full object-cover" alt="" />
+                                  </div>
+                                  <div>
+                                     <h4 className="font-black text-sm uppercase">{bid.photographerName}</h4>
+                                     <p className="text-[10px] text-gray-400 uppercase font-bold">Proposal Quote: KES {bid.quote.toLocaleString()}</p>
+                                  </div>
+                               </div>
+                               <div className="flex gap-2">
+                                  <button 
+                                    onClick={() => setActiveBidDetail(bid)}
+                                    className="px-6 py-3 bg-white text-black border border-gray-200 rounded-xl text-[9px] font-black uppercase tracking-widest hover:bg-gray-50"
+                                  >
+                                    Review
+                                  </button>
+                                  <button 
+                                    disabled={isHiring}
+                                    onClick={() => handleHire(bid)} 
+                                    className="px-6 py-3 bg-red-600 text-white rounded-xl text-[9px] font-black uppercase tracking-widest hover:bg-black transition-all flex items-center gap-2"
+                                  >
+                                     {isHiring ? <Loader2 size={12} className="animate-spin" /> : null}
+                                     Hire Now
+                                  </button>
+                               </div>
+                            </div>
+                          ))
+                        )}
+                     </div>
+                   )}
+                </AnimatePresence>
              </div>
            ) : userRole === 'photographer' ? (
+             /* IF PHOTOGRAPHER SUBMITTING A PITCH */
              <AnimatePresence mode="wait">
                {isSuccess ? (
-                 <motion.div 
-                   initial={{ opacity: 0, y: 20 }}
-                   animate={{ opacity: 1, y: 0 }}
-                   className="flex-1 flex flex-col items-center justify-center text-center py-20"
-                 >
+                 <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="flex-1 flex flex-col items-center justify-center text-center py-20">
                     <div className="w-24 h-24 bg-green-500 text-white rounded-full flex items-center justify-center shadow-2xl mb-8 animate-bounce">
                        <CheckCircle size={48} />
                     </div>
-                    <h3 className="font-embroidery text-4xl mb-2 italic text-black">PROPOSAL SENT</h3>
-                    <p className="text-gray-500 text-sm font-medium">The client will review your pitch and portfolio.</p>
+                    <h3 className="font-embroidery text-4xl mb-2 italic">PROPOSAL SENT</h3>
+                    <p className="text-gray-500 text-sm font-medium uppercase tracking-widest">Satellite dispatch confirmed.</p>
                  </motion.div>
+               ) : alreadyBid ? (
+                 <div className="flex-1 flex flex-col items-center justify-center text-center py-20">
+                    <div className="w-20 h-20 bg-gray-100 text-gray-400 rounded-full flex items-center justify-center mb-6">
+                       <ShieldCheck size={40} />
+                    </div>
+                    <h3 className="text-2xl font-black uppercase tracking-tighter">Proposal Active</h3>
+                    <p className="text-gray-500 text-sm mt-2">You have already submitted a pitch for this mission. Await client review.</p>
+                 </div>
                ) : (
-                 <motion.form onSubmit={handleSubmit} className="space-y-8 flex-1">
+                 <form onSubmit={handleSubmitProposal} className="space-y-8 flex-1">
                     <div className="space-y-4">
-                       <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest">Your Pitch</label>
+                       <div className="flex justify-between items-center">
+                          <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest">Mission Pitch</label>
+                          <span className="text-[9px] font-black text-gray-300 uppercase">{pitch.length}/500</span>
+                       </div>
                        <textarea 
                           required
+                          maxLength={500}
                           value={pitch}
                           onChange={(e) => setPitch(e.target.value)}
-                          placeholder="Why are you the perfect pro for this job?"
-                          className="w-full p-6 bg-gray-50 border border-gray-100 rounded-[2rem] outline-none focus:border-red-600 transition-all font-medium text-sm min-h-[150px] resize-none"
+                          placeholder="Tell the client why your lens is the best for this assignment..."
+                          className="w-full p-8 bg-gray-50 border border-gray-100 rounded-[2.5rem] outline-none focus:border-red-600 transition-all font-medium text-sm min-h-[200px] resize-none"
                        />
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                        <div className="space-y-4">
-                          <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest">Requested Quote (KES)</label>
+                          <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest">Project Quote (KES)</label>
                           <div className="relative">
-                             <DollarSign className="absolute left-6 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
                              <input 
                                 type="number" 
                                 required
                                 value={quote}
                                 onChange={(e) => setQuote(Number(e.target.value))}
-                                className="w-full pl-14 pr-6 py-4 bg-gray-50 border border-gray-100 rounded-2xl outline-none focus:border-red-600 transition-all font-black text-xl"
+                                className="w-full p-5 bg-gray-50 border border-gray-100 rounded-2xl outline-none focus:border-red-600 transition-all font-black text-2xl"
                              />
+                             <div className="absolute right-4 top-1/2 -translate-y-1/2 font-black text-gray-300 text-xs">KES</div>
                           </div>
-                          <p className="text-[9px] text-gray-400 font-bold uppercase">Client Budget: KSH {gig.budgetMin} - {gig.budgetMax}</p>
+                          <p className="text-[9px] text-gray-400 font-bold uppercase">Requested Budget: {gig.budgetMin} - {gig.budgetMax}</p>
                        </div>
                        <div className="bg-red-50 p-6 rounded-[2rem] border border-red-100">
-                          <Sparkles className="text-red-600 mb-2" size={24} />
-                          <span className="block text-[10px] font-black text-red-600 uppercase mb-2">Portfolio Integration</span>
-                          <p className="text-[10px] font-medium text-red-700 leading-relaxed uppercase">
-                             We will automatically attach your verified portfolio and top-selling assets to this bid.
-                          </p>
+                          <Target className="text-red-600 mb-2" size={24} />
+                          <span className="block text-[10px] font-black text-red-600 uppercase mb-1">Portfolio Link</span>
+                          <p className="text-[10px] font-medium text-red-700 leading-relaxed uppercase">We will automatically attach your verified stats and top-selling assets to this bid.</p>
                        </div>
                     </div>
 
-                    <div className="mt-auto pt-10">
-                       <button type="submit" className="w-full bg-red-600 text-white font-black py-5 rounded-[2rem] shadow-2xl shadow-red-900/40 hover:bg-red-700 transition-all text-xs uppercase tracking-widest flex items-center justify-center gap-3">
-                          SUBMIT OFFICIAL PROPOSAL <Send size={18} />
-                       </button>
-                       <p className="text-center text-[9px] font-black text-gray-400 uppercase mt-4 tracking-[0.2em]">Platform fee deducted upon successful completion</p>
-                    </div>
-                 </motion.form>
+                    <button type="submit" className="w-full bg-red-600 text-white font-black py-6 rounded-[2.5rem] shadow-2xl shadow-red-900/40 hover:bg-black transition-all text-xs uppercase tracking-widest flex items-center justify-center gap-3">
+                       TRANSMIT PROPOSAL <Send size={18} />
+                    </button>
+                 </form>
                )}
              </AnimatePresence>
            ) : (
-             <div className="space-y-8">
-                <div className="p-8 bg-gray-50 rounded-[2.5rem] border border-gray-100">
-                   <h4 className="font-black text-[10px] uppercase tracking-widest text-gray-400 mb-4">Job Description</h4>
-                   <p className="text-gray-800 leading-relaxed font-medium">
-                      {gig.description}
-                   </p>
-                </div>
-                <div className="bg-red-50 p-10 rounded-[3rem] border border-red-100 text-center">
-                   <User className="text-red-600 mx-auto mb-4" size={40} />
-                   <h4 className="font-bold text-xl mb-2">Join as Photographer?</h4>
-                   <p className="text-gray-500 text-sm mb-6">Switch your persona to "Photographer" to bid on this and other available gigs.</p>
-                </div>
+             <div className="space-y-8 py-10 text-center">
+                <ShieldCheck size={64} className="mx-auto text-gray-200" />
+                <h3 className="font-embroidery text-4xl italic text-gray-900 uppercase">Pro Access Required</h3>
+                <p className="text-gray-500 text-sm max-w-xs mx-auto">Switch to a Photographer persona to bid on this opportunity.</p>
              </div>
            )}
         </div>
@@ -494,245 +519,182 @@ const GigDetailModal = ({ gig, userRole, onClose }: { gig: Gig, userRole: UserRo
   );
 };
 
-// --- WIZARD COMPONENT FOR POSTING A NEW GIG ---
-const PostGigWizard = ({ onClose }: { onClose: any }) => {
+const PostGigWizard = ({ onClose, onGigAdded }: { onClose: any, onGigAdded: (g: Gig) => void }) => {
+  const { user } = useUserStore();
   const [step, setStep] = useState(1);
-  const [isPublishing, setIsPublishing] = useState(false);
-  const [isSuccess, setIsSuccess] = useState(false);
-
-  // Form State
+  const [isStkProcessing, setIsStkProcessing] = useState(false);
   const [formData, setFormData] = useState({
     title: '',
     description: '',
-    category: '',
+    category: 'General',
     location: '',
     deadline: '',
-    budget: 10000,
-    requirements: [] as string[]
+    budget: 15000,
   });
 
-  const next = () => setStep(s => Math.min(s + 5, 5));
+  const next = () => setStep(s => Math.min(s + 1, 4));
   const prev = () => setStep(s => Math.max(s - 1, 1));
 
-  const handlePublish = () => {
-    setIsPublishing(true);
+  const handleMpesaEscrow = () => {
+    if (!formData.title || !formData.description) return;
+    setIsStkProcessing(true);
+    // Simulate Safaricom STK Push Delay
     setTimeout(() => {
-      setIsPublishing(false);
-      setIsSuccess(true);
-    }, 2000);
+      setIsStkProcessing(false);
+      const newGig: Gig = {
+        id: `gig-${Date.now()}`,
+        title: formData.title,
+        description: formData.description,
+        category: formData.category as any,
+        location: formData.location || 'Nairobi',
+        deadline: formData.deadline || 'Flex-Date',
+        budgetMin: formData.budget * 0.8,
+        budgetMax: formData.budget,
+        currency: 'KES',
+        postedBy: user?.name || 'Anonymous Client',
+        status: 'Open',
+        type: 'Public',
+        urgency: formData.budget > 50000 ? 'Flash' : 'Normal',
+        requirements: ['Verified Pro', 'Raw Files'],
+      };
+      onGigAdded(newGig);
+      onClose();
+    }, 4000);
   };
 
-  if (isSuccess) {
-    return (
-      <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-black/80 backdrop-blur-md">
-        <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="bg-white rounded-[4rem] p-16 text-center max-w-lg w-full">
-           <div className="w-24 h-24 bg-green-500 text-white rounded-[2.5rem] flex items-center justify-center mx-auto mb-8 shadow-2xl rotate-12">
-              <CheckCircle size={48} />
-           </div>
-           <h3 className="font-embroidery text-5xl text-gray-900 italic mb-4 uppercase">GIG LIVE!</h3>
-           <p className="text-gray-500 font-medium mb-10 leading-relaxed">Your request has been broadcast to the Picha Zangu network. You will receive bids shortly.</p>
-           <button onClick={onClose} className="w-full bg-black text-white font-black py-5 rounded-2xl uppercase text-xs tracking-widest">Return to Dashboard</button>
-        </motion.div>
-      </div>
-    );
-  }
-
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-black/80 backdrop-blur-md overflow-y-auto">
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-6 bg-black/90 backdrop-blur-xl">
       <motion.div 
-        initial={{ scale: 0.9, opacity: 0, y: 20 }}
-        animate={{ scale: 1, opacity: 1, y: 0 }}
-        exit={{ scale: 0.9, opacity: 0 }}
-        className="bg-white rounded-[4rem] shadow-2xl overflow-hidden max-w-3xl w-full my-auto"
+        initial={{ scale: 0.9, y: 30 }}
+        animate={{ scale: 1, y: 0 }}
+        className="bg-white text-black rounded-[4rem] shadow-2xl overflow-hidden max-w-2xl w-full"
       >
-         <div className="bg-red-600 p-10 text-white flex justify-between items-center">
-            <div className="flex items-center gap-4">
-               <PlusCircle size={32} />
-               <h3 className="font-embroidery text-4xl italic uppercase">COMMISSION A PRO</h3>
-            </div>
-            <button onClick={onClose} className="hover:bg-black/20 p-3 rounded-full transition-colors"><X size={28}/></button>
-         </div>
+        <div className="bg-red-600 p-10 text-white flex justify-between items-center">
+           <h3 className="font-embroidery text-4xl italic uppercase">COMMISSION HUB</h3>
+           <button onClick={onClose} className="hover:bg-black/20 p-2 rounded-full"><X size={24}/></button>
+        </div>
 
-         <div className="p-12">
-            {/* Progress Bar */}
-            <div className="flex gap-3 mb-16">
-               {[1,2,3,4,5].map(s => (
-                 <div key={s} className={`h-1.5 flex-1 rounded-full transition-all duration-500 ${s <= step ? 'bg-red-600' : 'bg-gray-100'}`} />
-               ))}
-            </div>
+        <div className="p-8 md:p-12">
+          {/* Stepper Dots */}
+          <div className="flex gap-2 mb-12">
+            {[1,2,3,4].map(s => (
+              <div key={s} className={`h-1.5 flex-1 rounded-full transition-all ${step >= s ? 'bg-red-600' : 'bg-gray-100'}`} />
+            ))}
+          </div>
 
-            <div className="min-h-[400px] flex flex-col">
-               {step === 1 && (
-                 <div className="space-y-8 animate-in slide-in-from-right duration-500">
-                    <div>
-                      <h4 className="font-embroidery text-5xl mb-2 italic uppercase text-gray-900">IDENTITY & <span className="text-red-600">SECTOR</span></h4>
-                      <p className="text-gray-400 text-sm font-medium">Define your project title and professional category.</p>
-                    </div>
-                    <div className="space-y-6">
-                       <div className="space-y-2">
-                          <label className="text-[10px] font-black uppercase tracking-widest text-gray-400">Job Title</label>
-                          <input 
-                            type="text" 
-                            placeholder="e.g. Wedding Documentary in Karen" 
-                            className="w-full p-5 bg-gray-50 border border-gray-100 rounded-2xl outline-none focus:border-red-600 transition-all font-bold text-lg text-black"
-                            value={formData.title}
-                            onChange={(e) => setFormData({...formData, title: e.target.value})}
-                          />
-                       </div>
-                       <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                          {['Wedding', 'News', 'Sports', 'Fashion', 'Corporate', 'Other'].map(cat => (
-                            <button 
-                                key={cat}
-                                onClick={() => setFormData({...formData, category: cat})}
-                                className={`p-4 rounded-2xl border-2 transition-all text-center ${formData.category === cat ? 'bg-red-600 border-red-600 text-white shadow-xl' : 'bg-white border-gray-100 text-gray-500 hover:border-red-600'}`}
-                            >
-                                <span className="text-sm font-black uppercase tracking-tighter">{cat}</span>
-                            </button>
-                          ))}
-                       </div>
-                    </div>
-                 </div>
-               )}
+          <div className="min-h-[350px]">
+            <AnimatePresence mode="wait">
+              {step === 1 && (
+                <motion.div key="s1" initial={{ x: 20, opacity: 0 }} animate={{ x: 0, opacity: 1 }} className="space-y-6">
+                  <h4 className="font-embroidery text-4xl italic">MISSION TITLE</h4>
+                  <input 
+                    type="text" 
+                    placeholder="e.g. Traditional Swahili Wedding - 2 Days"
+                    className="w-full p-6 bg-gray-50 border border-gray-100 rounded-3xl outline-none focus:border-red-600 font-bold text-xl"
+                    value={formData.title}
+                    onChange={e => setFormData({...formData, title: e.target.value})}
+                  />
+                  <div className="grid grid-cols-3 gap-2">
+                    {['Wedding', 'News', 'Fashion'].map(c => (
+                      <button 
+                        key={c}
+                        type="button"
+                        onClick={() => setFormData({...formData, category: c})}
+                        className={`p-4 rounded-2xl border-2 transition-all font-black uppercase text-[10px] ${formData.category === c ? 'bg-red-600 border-red-600 text-white' : 'border-gray-100 text-gray-400'}`}
+                      >
+                        {c}
+                      </button>
+                    ))}
+                  </div>
+                </motion.div>
+              )}
 
-               {step === 2 && (
-                 <div className="space-y-8 animate-in slide-in-from-right duration-500">
-                    <div>
-                      <h4 className="font-embroidery text-5xl mb-2 italic uppercase text-gray-900">THE <span className="text-red-600">MISSION</span></h4>
-                      <p className="text-gray-400 text-sm font-medium">Describe your vision and requirements for the photographer.</p>
-                    </div>
-                    <textarea 
-                       rows={8}
-                       placeholder="Detail your requirements. What are the key moments? What is the expected delivery time? Mention any specific gear needed (e.g. Drones)."
-                       className="w-full p-8 bg-gray-50 border border-gray-100 rounded-[2.5rem] outline-none focus:border-red-600 transition-all font-medium text-black leading-relaxed"
-                       value={formData.description}
-                       onChange={(e) => setFormData({...formData, description: e.target.value})}
+              {step === 2 && (
+                <motion.div key="s2" initial={{ x: 20, opacity: 0 }} animate={{ x: 0, opacity: 1 }} className="space-y-6">
+                  <h4 className="font-embroidery text-4xl italic">THE BRIEF</h4>
+                  <textarea 
+                    rows={6}
+                    placeholder="Details about style, expected delivery, and specific shots..."
+                    className="w-full p-6 bg-gray-50 border border-gray-100 rounded-3xl outline-none focus:border-red-600 font-medium text-lg leading-relaxed"
+                    value={formData.description}
+                    onChange={e => setFormData({...formData, description: e.target.value})}
+                  />
+                </motion.div>
+              )}
+
+              {step === 3 && (
+                <motion.div key="s3" initial={{ x: 20, opacity: 0 }} animate={{ x: 0, opacity: 1 }} className="space-y-6">
+                  <h4 className="font-embroidery text-4xl italic">LOGISTICS</h4>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <input 
+                      type="text" 
+                      placeholder="Location"
+                      className="w-full p-5 bg-gray-50 border border-gray-100 rounded-2xl font-bold"
+                      value={formData.location}
+                      onChange={e => setFormData({...formData, location: e.target.value})}
                     />
-                 </div>
-               )}
+                    <input 
+                      type="date" 
+                      className="w-full p-5 bg-gray-50 border border-gray-100 rounded-2xl font-bold uppercase"
+                      value={formData.deadline}
+                      onChange={e => setFormData({...formData, deadline: e.target.value})}
+                    />
+                  </div>
+                </motion.div>
+              )}
 
-               {step === 3 && (
-                 <div className="space-y-8 animate-in slide-in-from-right duration-500">
-                    <div>
-                      <h4 className="font-embroidery text-5xl mb-2 italic uppercase text-gray-900">LOGISTICS & <span className="text-red-600">TIME</span></h4>
-                      <p className="text-gray-400 text-sm font-medium">Where and when is the assignment?</p>
-                    </div>
-                    <div className="space-y-6">
-                       <div className="relative">
-                          <MapIcon className="absolute left-6 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
-                          <input 
-                            type="text" 
-                            placeholder="Exact Location (e.g. Westlands, Nairobi)" 
-                            className="w-full pl-16 pr-6 py-5 bg-gray-50 border border-gray-100 rounded-2xl outline-none focus:border-red-600 transition-all font-bold text-black"
-                            value={formData.location}
-                            onChange={(e) => setFormData({...formData, location: e.target.value})}
-                          />
-                       </div>
-                       <div className="relative">
-                          <Calendar className="absolute left-6 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
-                          <input 
-                            type="date" 
-                            className="w-full pl-16 pr-6 py-5 bg-gray-50 border border-gray-100 rounded-2xl outline-none focus:border-red-600 transition-all font-bold text-black uppercase"
-                            value={formData.deadline}
-                            onChange={(e) => setFormData({...formData, deadline: e.target.value})}
-                          />
-                       </div>
-                    </div>
-                 </div>
-               )}
+              {step === 4 && (
+                <motion.div key="s4" initial={{ x: 20, opacity: 0 }} animate={{ x: 0, opacity: 1 }} className="space-y-8 text-center">
+                  <div>
+                    <h4 className="font-embroidery text-4xl italic mb-4">AUTHORIZE BUDGET</h4>
+                    <p className="text-gray-500 text-sm mb-10 font-medium uppercase tracking-widest">Authorize the Escrow deposit via M-Pesa</p>
+                    <span className="text-7xl font-bungee text-red-600">KES {formData.budget.toLocaleString()}</span>
+                    <input 
+                      type="range" min="5000" max="150000" step="5000"
+                      className="w-full h-2 bg-gray-100 rounded-full accent-red-600 mt-12"
+                      value={formData.budget}
+                      onChange={e => setFormData({...formData, budget: Number(e.target.value)})}
+                    />
+                  </div>
+                  <div className="p-6 bg-red-50 rounded-3xl border border-red-100 flex items-start gap-4 text-left">
+                    <Smartphone size={24} className="text-red-600 shrink-0" />
+                    <p className="text-[10px] font-bold text-red-700 uppercase leading-relaxed">By finalizing, a PIN request will be sent to your Safaricom handset to secure the funds in the Picha Zangu Escrow Node.</p>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
 
-               {step === 4 && (
-                 <div className="space-y-8 animate-in slide-in-from-right duration-500">
-                    <div>
-                      <h4 className="font-embroidery text-5xl mb-2 italic uppercase text-gray-900">BUDGET & <span className="text-red-600">ESCROW</span></h4>
-                      <p className="text-gray-400 text-sm font-medium">Set a fair market budget. Funds are held in escrow for safety.</p>
-                    </div>
-                    <div className="p-10 bg-gray-900 rounded-[3rem] text-white relative overflow-hidden">
-                       <div className="relative z-10">
-                          <div className="flex items-center gap-3 mb-8">
-                             <Zap className="text-red-600 animate-pulse" size={28} />
-                             <span className="text-red-600 font-black text-[10px] uppercase tracking-widest">AI Market Check Active</span>
-                          </div>
-                          <input 
-                            type="range" 
-                            min="5000" 
-                            max="200000" 
-                            step="5000"
-                            value={formData.budget}
-                            onChange={(e) => setFormData({...formData, budget: Number(e.target.value)})}
-                            className="w-full accent-red-600 mb-10 h-2 bg-white/10 rounded-full"
-                          />
-                          <div className="text-center">
-                             <span className="text-6xl font-bungee text-white">KSH {formData.budget.toLocaleString()}</span>
-                             <p className="text-[10px] font-black text-gray-500 uppercase mt-4 tracking-[0.4em]">Suggested for {formData.category || 'High-End'} assignments</p>
-                          </div>
-                       </div>
-                       <DollarSign size={200} className="absolute -right-10 -bottom-10 text-white/5 opacity-10" />
-                    </div>
-                 </div>
-               )}
-
-               {step === 5 && (
-                 <div className="space-y-8 animate-in slide-in-from-right duration-500 flex-1 flex flex-col">
-                    <div>
-                      <h4 className="font-embroidery text-5xl mb-2 italic uppercase text-gray-900">FINAL <span className="text-red-600">REVIEW</span></h4>
-                      <p className="text-gray-400 text-sm font-medium">Verify your details before broadcasting to the network.</p>
-                    </div>
-                    <div className="flex-1 bg-gray-50 rounded-[3rem] p-10 space-y-6 border border-gray-100 overflow-y-auto max-h-[300px] custom-scrollbar">
-                       <ReviewItem label="TITLE" value={formData.title || 'Untitled Project'} />
-                       <ReviewItem label="CATEGORY" value={formData.category || 'General'} />
-                       <ReviewItem label="DESCRIPTION" value={formData.description || 'No details provided.'} />
-                       <ReviewItem label="LOCATION" value={formData.location || 'Remote'} />
-                       <ReviewItem label="DATE" value={formData.deadline || 'Flex-date'} />
-                       <ReviewItem label="ESCROW BUDGET" value={`KSH ${formData.budget.toLocaleString()}`} accent />
-                    </div>
-                    <div className="p-6 bg-red-50 rounded-3xl border border-red-100 flex items-start gap-4">
-                       <ShieldCheck className="text-red-600 mt-1 shrink-0" size={24} />
-                       <p className="text-[10px] font-bold text-red-700 leading-relaxed uppercase tracking-widest">
-                          By publishing, you agree to Picha Zangu's regional escrow protocols. Your payment will be authorized via STK push upon publication.
-                       </p>
-                    </div>
-                 </div>
-               )}
-            </div>
-
-            <div className="flex gap-4 mt-12 pt-10 border-t border-gray-100">
-               {step > 1 && (
-                 <button onClick={prev} className="flex-1 bg-gray-100 text-gray-900 font-black py-5 rounded-[2rem] hover:bg-gray-200 transition-all flex items-center justify-center gap-2 uppercase text-xs tracking-widest">
-                   <ChevronLeft size={18}/> Back
-                 </button>
-               )}
-               {step < 5 ? (
-                 <button 
-                    disabled={step === 1 && !formData.title}
-                    onClick={next} 
-                    className="flex-[2] bg-red-600 text-white font-black py-5 rounded-[2rem] shadow-xl shadow-red-900/20 hover:bg-black transition-all uppercase text-xs tracking-widest flex items-center justify-center gap-2"
-                 >
-                    Continue <ChevronRight size={18}/>
-                 </button>
-               ) : (
-                 <button 
-                   onClick={handlePublish}
-                   disabled={isPublishing}
-                   className="flex-[2] bg-red-600 text-white font-black py-5 rounded-[2rem] shadow-2xl shadow-red-900/40 hover:bg-black transition-all uppercase text-xs tracking-widest flex items-center justify-center gap-3"
-                 >
-                    {/* // Fixed 'Cannot find name Loader2' by adding it to the lucide-react import list. */}
-                    {isPublishing ? <Loader2 size={20} className="animate-spin" /> : <Plus size={20} />}
-                    {isPublishing ? 'PUBLISHING...' : 'PAY & BROADCAST GIG'}
-                 </button>
-               )}
-            </div>
-         </div>
+          <div className="mt-12 flex gap-4">
+            {step > 1 && (
+              <button onClick={prev} className="flex-1 py-5 bg-gray-100 text-black rounded-2xl font-black uppercase text-xs tracking-widest">Back</button>
+            )}
+            {step < 4 ? (
+              <button 
+                onClick={next} 
+                disabled={step === 1 && !formData.title}
+                className="flex-[2] py-5 bg-black text-white rounded-2xl font-black uppercase text-xs tracking-widest shadow-xl disabled:opacity-30"
+              >
+                Continue <ChevronRight className="inline ml-2" size={16}/>
+              </button>
+            ) : (
+              <button 
+                onClick={handleMpesaEscrow}
+                disabled={isStkProcessing}
+                className="flex-[2] py-5 bg-red-600 text-white rounded-2xl font-black uppercase text-xs tracking-widest shadow-2xl flex items-center justify-center gap-3"
+              >
+                {isStkProcessing ? <Loader2 size={20} className="animate-spin" /> : <Smartphone size={20} />}
+                {isStkProcessing ? 'WAITING FOR PIN...' : 'EXECUTE AUTHORIZATION'}
+              </button>
+            )}
+          </div>
+        </div>
       </motion.div>
     </div>
   );
 };
 
-const ReviewItem = ({label, value, accent}: {label: string, value: string, accent?: boolean}) => (
-  <div className="border-b border-gray-200 pb-4 last:border-0">
-     <span className="block text-[8px] font-black text-gray-400 uppercase tracking-widest mb-1">{label}</span>
-     <span className={`text-sm font-bold ${accent ? 'text-red-600 font-bungee text-xl' : 'text-gray-900'}`}>{value}</span>
-  </div>
-);
+// --- UTILS ---
 
 const NavBtn = ({ active, label, onClick }: { active: boolean, label: string, onClick: any }) => (
   <button 
@@ -741,6 +703,16 @@ const NavBtn = ({ active, label, onClick }: { active: boolean, label: string, on
   >
     {label}
   </button>
+);
+
+const DetailItem = ({icon, label, val}: any) => (
+  <div className="flex items-center gap-4">
+     <div className="text-red-500">{icon}</div>
+     <div>
+        <span className="block text-[8px] font-black text-gray-500 uppercase">{label}</span>
+        <span className="text-sm font-bold">{val}</span>
+     </div>
+  </div>
 );
 
 export default Gigz;

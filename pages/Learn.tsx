@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
-  Award, BookOpen, Briefcase, Camera, CheckCircle2, ChevronRight, 
+  Award, BookOpen, Camera, CheckCircle2, ChevronRight, 
   Download, FileText, Globe, GraduationCap, HardDrive, 
   PlayCircle, Sparkles, Star, Users, Video, Zap, ArrowLeft,
   Lock, Clock, Trophy, Target, Book, Layout, Info, Play,
@@ -10,15 +10,19 @@ import {
   Image as ImageIcon, HelpCircle, Activity, ShieldCheck,
   Settings, Layers, Cpu, Database, Eye, ZapOff, FlaskConical, Binary, Microscope,
   Wind, Ghost, Palette, Lightbulb, UserCheck, Flame, Scale, Scissors,
-  // Fixed 'Cannot find name ScanFace' and 'Cannot find name BarChart3' by adding them to the lucide-react import list.
-  ScanFace, BarChart3
+  ScanFace, BarChart3, CheckCircle, Upload, Loader2, RefreshCw, QrCode
 } from 'lucide-react';
-import { MOCK_ACADEMY_COURSES } from '../constants';
+import { MOCK_ACADEMY_COURSES, MOCK_QUIZ_DATA } from '../constants';
 import { AcademyCourse, Lesson } from '../types';
+import { useToastStore } from '../store/useAppStore';
+import { GoogleGenAI } from "@google/genai";
 
 const Learn: React.FC = () => {
   const [selectedCourse, setSelectedCourse] = useState<AcademyCourse | null>(null);
   const [activeLesson, setActiveLesson] = useState<Lesson | null>(null);
+  const [localCourseData, setLocalCourseData] = useState<AcademyCourse[]>(MOCK_ACADEMY_COURSES);
+  
+  const showToast = useToastStore((state) => state.showToast);
 
   const tiers = [
     {
@@ -62,21 +66,49 @@ const Learn: React.FC = () => {
   ];
 
   const handleEnterCourse = (courseId: string) => {
-    const course = MOCK_ACADEMY_COURSES.find(c => c.id === courseId);
-    if (course) setSelectedCourse(course);
+    const course = localCourseData.find(c => c.id === courseId);
+    if (course) {
+      setSelectedCourse(course);
+      if (!activeLesson) {
+        setActiveLesson(course.modules[0].lessons[0]);
+      }
+      showToast(`Entering ${course.title} Node`, "info");
+    }
   };
 
-  const getLessonContent = (id: string) => {
-    const contentMap: Record<string, React.ReactNode> = {
-      'l1': <ModuleOneContent />,
-      'l2': <ModuleOneContent />,
-      'l13': <ModuleThreeContent />,
-      'l16': <ModuleFourContent />,
-      'l30': <ModuleFiveContent />,
-      'l24': <ModuleSixContent />,
-    };
-    return contentMap[id] || <ModuleSixContent />; 
+  const handleLessonComplete = (lessonId: string) => {
+    if (!selectedCourse) return;
+
+    const updatedCourses = localCourseData.map(course => {
+      if (course.id === selectedCourse.id) {
+        const updatedModules = course.modules.map(mod => ({
+          ...mod,
+          lessons: mod.lessons.map(lesson => 
+            lesson.id === lessonId ? { ...lesson, isCompleted: true } : lesson
+          )
+        }));
+
+        const totalLessons = updatedModules.reduce((acc, m) => acc + m.lessons.length, 0);
+        const completedLessons = updatedModules.reduce((acc, m) => acc + m.lessons.filter(l => l.isCompleted).length, 0);
+        const newProgress = Math.round((completedLessons / totalLessons) * 100);
+
+        const updatedCourse = { ...course, modules: updatedModules, progress: newProgress };
+        setSelectedCourse(updatedCourse);
+        
+        if (activeLesson?.id === lessonId) {
+          setActiveLesson(updatedCourse.modules.flatMap(m => m.lessons).find(l => l.id === lessonId) || null);
+        }
+
+        return updatedCourse;
+      }
+      return course;
+    });
+
+    setLocalCourseData(updatedCourses);
+    showToast("Node Mastery Synchronized", "success");
   };
+
+  const isGraduated = selectedCourse?.progress === 100;
 
   return (
     <div className="min-h-screen bg-[#050505] text-white selection:bg-red-600 font-sans">
@@ -147,7 +179,7 @@ const Learn: React.FC = () => {
                                   <div className={`w-2 h-2 rounded-full ${lesson.isCompleted ? 'bg-green-500' : 'bg-gray-800'}`} />
                                   <span className="text-[11px] font-black uppercase tracking-tight line-clamp-1">{lesson.title}</span>
                                </div>
-                               {lesson.type === 'video' ? <Play size={12} /> : lesson.type === 'quiz' ? <Trophy size={12} /> : <Book size={12} />}
+                               {lesson.type === 'video' ? <Play size={12} /> : lesson.type === 'quiz' ? <Trophy size={12} /> : lesson.type === 'practical' ? <Activity size={12} /> : <Book size={12} />}
                             </button>
                           ))}
                        </div>
@@ -158,22 +190,26 @@ const Learn: React.FC = () => {
 
             <main className="flex-1 bg-black overflow-y-auto custom-scrollbar relative">
                <AnimatePresence mode="wait">
-                  {activeLesson ? (
+                  {isGraduated ? (
+                    <GraduationPortal course={selectedCourse} onExit={() => setSelectedCourse(null)} />
+                  ) : activeLesson ? (
                     <motion.div key={activeLesson.id} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="max-w-4xl mx-auto p-20 space-y-12">
                        <div className="flex items-center justify-between border-b border-white/5 pb-10">
                           <div className="flex items-center gap-4">
                             <div className="w-14 h-14 bg-red-600 rounded-2xl flex items-center justify-center text-white shadow-xl shadow-red-900/40"><Camera size={28} /></div>
                             <div>
-                               <span className="text-red-600 text-[10px] font-black uppercase tracking-[0.4em] block">MODULE {activeLesson.id.replace('l','')}</span>
+                               <span className="text-red-600 text-[10px] font-black uppercase tracking-[0.4em] block">NODE {activeLesson.id.replace('l','')}</span>
                                <h1 className="font-embroidery text-6xl text-white italic leading-none">{activeLesson.title}</h1>
                             </div>
                           </div>
                           <div className="flex gap-2">
-                             <button className="p-4 bg-white/5 rounded-2xl border border-white/10 hover:text-red-600 transition-colors"><Bookmark size={20}/></button>
-                             <button className="p-4 bg-white/5 rounded-2xl border border-white/10 hover:text-red-600 transition-colors"><Share2 size={20}/></button>
+                             <button onClick={() => showToast("Content Bookmarked", "info")} className="p-4 bg-white/5 rounded-2xl border border-white/10 hover:text-red-600 transition-colors"><Bookmark size={20}/></button>
+                             <button onClick={() => showToast("Sharing Academy Node...", "info")} className="p-4 bg-white/5 rounded-2xl border border-white/10 hover:text-red-600 transition-colors"><Share2 size={20}/></button>
                           </div>
                        </div>
-                       <div className="text-gray-300 font-medium">{getLessonContent(activeLesson.id)}</div>
+                       <div className="text-gray-300 font-medium">
+                          <LessonController lesson={activeLesson} onComplete={() => handleLessonComplete(activeLesson.id)} />
+                       </div>
                     </motion.div>
                   ) : (
                     <div className="flex flex-col items-center justify-center h-full text-center p-20 opacity-30">
@@ -190,449 +226,301 @@ const Learn: React.FC = () => {
   );
 };
 
-// --- MODULE CONTENT ---
+// --- CORE FEATURE COMPONENTS ---
 
-const ModuleOneContent = () => (
+const LessonController = ({ lesson, onComplete }: { lesson: Lesson, onComplete: () => void }) => {
+  if (lesson.id === 'l1' || lesson.id === 'l30') return <ReadingNode lesson={lesson} onComplete={onComplete} />;
+  if (lesson.type === 'video') return <VideoNode lesson={lesson} onComplete={onComplete} />;
+  if (lesson.type === 'quiz') return <QuizNode lesson={lesson} onComplete={onComplete} />;
+  if (lesson.type === 'practical') return <PracticalNode lesson={lesson} onComplete={onComplete} />;
+  
+  return null;
+};
+
+const ReadingNode = ({ lesson, onComplete }: any) => (
   <div className="space-y-12 pb-20">
     <div className="space-y-6">
       <h2 className="text-4xl font-black uppercase tracking-tighter text-white">I. The Philosophy of the Lens</h2>
       <p className="text-lg leading-relaxed text-gray-400 uppercase">
-        Photography is more than just pressing a button; it is the art of "writing with light." Derived from the Greek words <i>phos</i> (light) and <i>graphē</i> (drawing), photography is a universal language. In the context of East Africa, photography serves as a tool for preservation and progress. Whether it’s capturing the vibrant energy of a Nairobi street market or the serene beauty of the Serengeti, a photographer is a historian of the present.
+        Photography is more than just pressing a button; it is the art of "writing with light." Derived from the Greek words <i>phos</i> (light) and <i>graphē</i> (drawing), photography is a universal language. In the context of East Africa, photography serves as a tool for preservation and progress.
       </p>
     </div>
     <div className="bg-[#0a0a0a] border border-white/5 rounded-[3.5rem] p-10 space-y-8">
-       <h3 className="font-embroidery text-4xl italic text-white">When Did It Start?</h3>
-       <p className="text-lg leading-relaxed text-gray-400">Centuries ago, philosophers noticed that light passing through a tiny hole into a dark room would project an inverted image. This was the Camera Obscura.</p>
+       <h3 className="font-embroidery text-4xl italic text-white">The Decisive Moment</h3>
+       <p className="text-lg leading-relaxed text-gray-400 italic">"To take a photograph is to align the head, the eye and the heart. It's a way of life." — Henri Cartier-Bresson</p>
     </div>
+    <button 
+      onClick={onComplete}
+      className={`w-full py-6 rounded-2xl font-black text-xs uppercase tracking-widest transition-all flex items-center justify-center gap-3 ${lesson?.isCompleted ? 'bg-green-500/10 text-green-500 border border-green-500/20' : 'bg-red-600 text-white shadow-xl hover:bg-black'}`}
+    >
+      {lesson?.isCompleted ? <CheckCircle size={20} /> : <Zap size={20} />}
+      {lesson?.isCompleted ? 'MASTERY VERIFIED' : 'MARK READING AS COMPLETE'}
+    </button>
   </div>
 );
 
-const ModuleThreeContent = () => (
-  <div className="space-y-24 pb-40">
-    {/* HERO SECTION */}
-    <div className="space-y-10">
-      <div className="relative h-[600px] rounded-[4.5rem] overflow-hidden group shadow-2xl border border-white/5">
-        <img src="https://images.unsplash.com/photo-1516035069371-29a1b244cc32?auto=format&fit=crop&w=1600&q=80" className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-1000 group-hover:scale-105" alt="Vintage Camera Mechanism" />
-        <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent" />
-        <div className="absolute bottom-16 left-16 right-16">
-          <div className="flex items-center gap-4 mb-6">
-            <History size={32} className="text-red-600" />
-            <span className="text-xs font-black text-red-600 uppercase tracking-[0.5em]">Heritage Node 03.1</span>
-          </div>
-          <h2 className="font-embroidery text-7xl md:text-9xl text-white italic leading-none">OLD FEATURES <br/> <span className="font-embroidery-sketch">MODERN MASTERY</span></h2>
-        </div>
-      </div>
+const VideoNode = ({ lesson, onComplete }: any) => {
+  const [isWatching, setIsWatching] = useState(false);
+  const [watchProgress, setWatchProgress] = useState(0);
 
-      <div className="prose prose-invert max-w-none space-y-10">
-        <p className="text-2xl text-gray-400 font-medium leading-relaxed uppercase tracking-tight">
-          To master a modern camera, you must respect its ancestors. Every digital setting you see today is a digital simulation of a physical, mechanical process from the 20th century. In the "Old World," features were tactile. To change your "ISO" (sensitivity), you had to physically open the back of the camera and swap the roll of film. To change your shutter speed, you turned a heavy metal dial that wound a spring.
-        </p>
-        <p className="text-xl text-gray-400 leading-relaxed uppercase">
-          In East Africa, many of our legendary photojournalists started on these mechanical beasts. They learned the "feel" of the camera. As a Pichazangu student, understanding these features helps you troubleshoot. When your digital camera fails to focus, knowing how a manual "Rangefinder" worked helps you understand how to fix it yourself.
-        </p>
-      </div>
-    </div>
+  useEffect(() => {
+    let interval: any;
+    if (isWatching && watchProgress < 100) {
+      interval = setInterval(() => {
+        setWatchProgress(prev => Math.min(prev + 1, 100));
+      }, 50);
+    }
+    return () => clearInterval(interval);
+  }, [isWatching, watchProgress]);
 
-    {/* SECTION 1: THE TACTILE ANCESTORS */}
-    <div className="grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
-      <div className="space-y-10">
-        <div className="flex items-center gap-4">
-           <div className="w-16 h-16 bg-red-600 rounded-[2rem] flex items-center justify-center shadow-[0_0_40px_rgba(227,30,36,0.4)]">
-              <Scale size={36} />
-           </div>
-           <h3 className="font-embroidery text-5xl italic text-white uppercase">The Tactile Ancestors</h3>
-        </div>
-        <div className="space-y-8">
-           <p className="text-gray-400 text-lg leading-relaxed font-medium uppercase">
-              The history of the camera is a history of physical movement. Before touchscreens and menus, every change required a mechanical action.
-           </p>
-           <div className="grid grid-cols-1 gap-6">
-              <LegacyFeature 
-                icon={<CircleIcon size={24}/>} 
-                title="The Aperture Ring" 
-                desc="On old lenses, you twisted a ring on the lens itself to physically move the 'blades.' Today, most cameras control this via a thumbwheel on the body." 
-              />
-              <LegacyFeature 
-                icon={<Binary size={24}/>} 
-                title="The ISO/ASA Dial" 
-                desc="Previously fixed by the film type (e.g., Kodak 400). Modern cameras have 'Auto-ISO,' allowing the camera to adjust sensitivity instantly." 
-              />
-              <LegacyFeature 
-                icon={<Activity size={24}/>} 
-                title="The Film Advance Lever" 
-                desc="That satisfying 'crank' sound after every shot. Today, we have 'Burst Mode,' taking 30 photos in a single second." 
-              />
-           </div>
-        </div>
-      </div>
-      <div className="space-y-6">
-        <div className="aspect-square rounded-[4rem] overflow-hidden border border-white/10 shadow-2xl relative group">
-           <img src="https://images.unsplash.com/photo-1495707902641-75cac588d2e9?auto=format&fit=crop&w=1200&q=80" className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-1000" alt="Vintage Dial" />
-           <div className="absolute inset-0 bg-black/40" />
-           <div className="absolute inset-0 flex items-center justify-center">
-              <History size={120} className="text-white/10" />
-           </div>
-        </div>
-        <p className="text-[11px] font-black text-gray-600 uppercase tracking-[0.5em] text-center">[Visual Node 3.2: Mechanical Dial Architecture of a 1970s SLR]</p>
-      </div>
-    </div>
-
-    {/* SECTION 2: THE DIGITAL BRAIN */}
-    <div className="bg-white text-black p-16 rounded-[4.5rem] relative overflow-hidden">
-       <div className="relative z-10 space-y-12">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-8">
-             <div>
-                <div className="flex items-center gap-4 mb-4">
-                   <Cpu size={32} className="text-red-600" />
-                   <span className="text-red-600 font-black text-[11px] uppercase tracking-[0.5em]">Silicon Evolution</span>
-                </div>
-                <h2 className="font-embroidery text-6xl md:text-8xl italic leading-tight">MODERN FEATURES: <br/><span className="font-embroidery-sketch text-red-600">THE BRAIN</span></h2>
-             </div>
-             <p className="max-w-xl text-lg font-medium text-gray-500 leading-relaxed uppercase">
-                Modern cameras like the ones used by Pichazangu Pros have features the pioneers never dreamed of. We have moved from physics to computation.
-             </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-             <ModernFeatureCard 
-                icon={<Activity/>}
-                title="IBIS"
-                desc="In-Body Image Stabilization. A floating sensor that cancels out hand tremors, allowing for sharp shots even in low light."
-             />
-             <ModernFeatureCard 
-                icon={<ScanFace/>}
-                title="EYE-TRACKING AF"
-                desc="The camera uses AI to find the eye of a lion or a bride and keeps it sharp, even if they are moving at high speed."
-             />
-             <ModernFeatureCard 
-                icon={<BarChart3/>}
-                title="HISTOGRAM"
-                desc="A digital graph that tells you if your photo is too dark or too bright before you even take the shot. No more guesswork."
-             />
-          </div>
-       </div>
-       <div className="absolute top-0 right-0 p-20 opacity-[0.03] select-none pointer-events-none text-[35rem] font-embroidery whitespace-nowrap rotate-12">
-          シリコン
-       </div>
-    </div>
-
-    {/* PRO TIP: RED PROTOCOL */}
-    <div className="p-16 bg-red-600 rounded-[4rem] text-white shadow-3xl relative overflow-hidden group">
-       <div className="relative z-10 max-w-4xl">
-          <div className="flex items-center gap-4 mb-8">
-             <Zap size={32} className="fill-current" />
-             <span className="text-xs font-black uppercase tracking-[0.5em]">The Pro Tip (RED)</span>
-          </div>
-          <h3 className="font-embroidery text-6xl md:text-8xl italic leading-none mb-10">DON'T BE A <br/><span className="font-embroidery-sketch text-black">TOURIST.</span></h3>
-          <p className="text-xl md:text-2xl font-bold uppercase tracking-tight leading-relaxed mb-12">
-             Don't get distracted by "Scene Modes" (like Portrait or Sports mode). These are for tourists. A Pichazangu Pro uses 'Aperture Priority' or 'Manual' to take full creative control of the narrative.
-          </p>
-       </div>
-       <Globe size={400} className="absolute -right-20 -bottom-20 opacity-10 rotate-12 group-hover:rotate-0 transition-transform duration-700" />
-    </div>
-
-    {/* EXPERIMENTAL TIP */}
+  return (
     <div className="space-y-12">
-       <div className="bg-white/5 border border-white/10 p-16 rounded-[4rem] relative overflow-hidden group">
-          <div className="relative z-10 max-w-4xl">
-             <div className="flex items-center gap-4 mb-10">
-                <Volume2 size={32} className="text-red-600 animate-pulse" />
-                <h2 className="font-embroidery text-5xl text-white italic">PRACTICAL: <span className="text-red-600">SOUND OF SPEED</span></h2>
-             </div>
-             <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
-                <div className="space-y-6">
-                   <p className="text-gray-400 text-lg uppercase font-medium leading-relaxed">
-                      Set your camera to "Shutter Priority" (S or Tv mode). Take a photo at 1/10th of a second, then take one at 1/1000th of a second.
-                   </p>
-                   <div className="space-y-4">
-                      <Step num="01" text="Listen to the click. The first will be a slow, 'ker-thunk'." />
-                      <Step num="02" text="The second will be a sharp, 'tick'." />
-                      <Step num="03" text="This exercise trains your ears to recognize shutter speed without looking at the screen." />
-                   </div>
-                </div>
-                <div className="bg-black p-10 rounded-[3rem] border border-white/5 flex flex-col justify-center text-center">
-                   <Clock size={64} className="text-red-600 mx-auto mb-8" />
-                   <h4 className="text-2xl font-black text-white mb-4 uppercase">BUILD SONIC MEMORY</h4>
-                   <p className="text-gray-500 text-sm font-bold leading-relaxed uppercase tracking-widest">
-                      "A master knows the state of the machine by the rhythm of its mechanics. Listen to the light."
-                   </p>
-                </div>
-             </div>
-          </div>
-       </div>
-    </div>
-  </div>
-);
-
-const ModuleFourContent = () => (
-  <div className="space-y-24 pb-40">
-    {/* HERO SECTION */}
-    <div className="space-y-10">
-      <div className="relative h-[600px] rounded-[4.5rem] overflow-hidden group shadow-2xl border border-white/5">
-        <img src="https://images.unsplash.com/photo-1554048612-b6a482bc67e5?auto=format&fit=crop&w=1600&q=80" className="w-full h-full object-cover group-hover:scale-105 transition-all duration-1000" alt="Professional Grip" />
-        <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent" />
-        <div className="absolute bottom-16 left-16 right-16">
-          <div className="flex items-center gap-4 mb-6">
-            <Hand size={32} className="text-red-600" />
-            <span className="text-xs font-black text-red-600 uppercase tracking-[0.5em]">Biomechanics Node 04.1</span>
-          </div>
-          <h2 className="font-embroidery text-7xl md:text-9xl text-white italic leading-none">THE HANDSHAKE: <br/> <span className="font-embroidery-sketch">THE GRIP</span></h2>
-        </div>
-      </div>
-
-      <div className="prose prose-invert max-w-none space-y-10">
-        <p className="text-2xl text-gray-400 font-medium leading-relaxed uppercase tracking-tight">
-          The most common mistake amateurs make is holding the camera like a smartphone. To shoot for Pichazangu, you need stability. You are not just holding a device; you are anchoring a scientific instrument to your skeleton.
-        </p>
-        <p className="text-xl text-gray-400 leading-relaxed uppercase">
-          Stability is the foundation of sharpness. In a busy Nairobi street or a dark event hall, you cannot always rely on high ISO. You must rely on your bones. This module teaches you the physical protocols for turning your body into a solid media node.
-        </p>
-      </div>
-    </div>
-
-    {/* SECTION 1: THE PROFESSIONAL GRIP */}
-    <div className="grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
-      <div className="space-y-10">
-        <div className="flex items-center gap-4">
-           <div className="w-16 h-16 bg-red-600 rounded-[2rem] flex items-center justify-center shadow-[0_0_40px_rgba(227,30,36,0.4)]">
-              <Crosshair size={36} />
+      <div className="relative aspect-video rounded-[3rem] bg-[#111] border border-white/5 overflow-hidden group shadow-2xl">
+         {!isWatching ? (
+           <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/60 backdrop-blur-md z-10">
+              <button onClick={() => setIsWatching(true)} className="p-10 bg-red-600 rounded-full text-white shadow-2xl hover:scale-110 transition-transform">
+                <Play size={40} fill="currentColor" />
+              </button>
+              <p className="mt-6 font-black uppercase text-xs tracking-widest text-gray-400">Initialize Academy Stream</p>
            </div>
-           <h3 className="font-embroidery text-5xl italic text-white uppercase">The Human Tripod</h3>
-        </div>
-        <div className="space-y-6">
-           <GripPoint 
-              num="01" 
-              title="The Left Hand: The Cradle" 
-              desc="This is your primary support. It should sit underneath the lens, supporting the full weight of the glass and allowing your fingers to zoom or focus." 
-           />
-           <GripPoint 
-              num="02" 
-              title="The Right Hand: The Trigger" 
-              desc="Your palm should wrap firmly around the grip, with your index finger resting lightly on the shutter. Do not 'clutch' too hard; stay fluid." 
-           />
-           <GripPoint 
-              num="03" 
-              title="The Anchor: The Chassis" 
-              desc="Tuck your elbows into your ribs and stand with your feet shoulder-width apart. You have now turned your skeletal system into a human tripod." 
-           />
-        </div>
-      </div>
-      <div className="relative">
-         <div className="aspect-[3/4] rounded-[4rem] overflow-hidden border border-white/5 shadow-2xl relative group bg-[#0a0a0a]">
-            <img src="https://images.unsplash.com/photo-1516035069371-29a1b244cc32?auto=format&fit=crop&w=1200&q=80" className="w-full h-full object-cover opacity-20" alt="Grip Diagram" />
-            <div className="absolute inset-0 flex items-center justify-center">
-               <div className="space-y-8 w-full px-12">
-                  <div className="h-0.5 bg-red-600/50 w-full relative"><div className="absolute -top-1.5 left-0 w-3 h-3 bg-red-600 rounded-full" /></div>
-                  <div className="h-0.5 bg-red-600/50 w-2/3 relative"><div className="absolute -top-1.5 left-0 w-3 h-3 bg-red-600 rounded-full" /></div>
-                  <div className="h-0.5 bg-red-600/50 w-full relative"><div className="absolute -top-1.5 left-0 w-3 h-3 bg-red-600 rounded-full" /></div>
-               </div>
-            </div>
+         ) : (
+           <div className="w-full h-full bg-black relative flex items-center justify-center">
+              <div className="text-center space-y-4">
+                 <Loader2 size={48} className="animate-spin text-red-600 mx-auto" />
+                 <span className="text-[10px] font-black text-red-600 uppercase tracking-[0.4em]">Streaming Node {lesson.id}</span>
+              </div>
+           </div>
+         )}
+         <div className="absolute bottom-0 left-0 right-0 h-2 bg-white/5">
+            <motion.div animate={{ width: `${watchProgress}%` }} className="h-full bg-red-600" />
          </div>
-         <p className="text-[11px] font-black text-gray-600 uppercase tracking-[0.5em] text-center mt-6">[Visual Node 4.2: Biomechanical Anchor Points for Handheld Stability]</p>
+      </div>
+      
+      <div className="space-y-6">
+        <h3 className="text-3xl font-black uppercase tracking-tighter">Verified Visual Stream</h3>
+        <p className="text-gray-400 font-medium leading-relaxed uppercase">
+          {lesson.title}: Regional technique demonstration for high-speed synchronization.
+        </p>
+        <button 
+          disabled={watchProgress < 100}
+          onClick={onComplete}
+          className={`w-full py-6 rounded-2xl font-black text-xs uppercase tracking-widest transition-all flex items-center justify-center gap-3 ${lesson?.isCompleted ? 'bg-green-500/10 text-green-500' : watchProgress === 100 ? 'bg-red-600 text-white' : 'bg-gray-800 text-gray-600 cursor-not-allowed'}`}
+        >
+          {lesson?.isCompleted ? <CheckCircle size={20} /> : <Zap size={20} />}
+          {lesson?.isCompleted ? 'MASTERY VERIFIED' : watchProgress === 100 ? 'SYNCHRONIZE NODE' : `WATCHING: ${watchProgress}%`}
+        </button>
       </div>
     </div>
+  );
+};
 
-    {/* SECTION 2: NAVIGATING THE MENU */}
-    <div className="bg-white text-black p-16 rounded-[4.5rem] relative overflow-hidden">
-       <div className="relative z-10 space-y-12">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-8">
-             <div>
-                <div className="flex items-center gap-4 mb-4">
-                   <Settings size={32} className="text-red-600" />
-                   <span className="text-red-600 font-black text-[11px] uppercase tracking-[0.5em]">Command Logic</span>
+const QuizNode = ({ lesson, onComplete }: any) => {
+  const quiz = MOCK_QUIZ_DATA[lesson.id];
+  const [currentIdx, setCurrentIdx] = useState(0);
+  const [failed, setFailed] = useState(false);
+  const [complete, setComplete] = useState(false);
+
+  const handleAnswer = (idx: number) => {
+    if (idx === quiz.questions[currentIdx].correct) {
+      const next = currentIdx + 1;
+      if (next < quiz.questions.length) {
+        setCurrentIdx(next);
+      } else {
+        setComplete(true);
+      }
+    } else {
+      setFailed(true);
+    }
+  };
+
+  const reset = () => {
+    setCurrentIdx(0);
+    setFailed(false);
+    setComplete(false);
+  };
+
+  return (
+    <div className="space-y-12">
+      <div className="bg-[#0a0a0a] border border-white/5 rounded-[3.5rem] p-12 min-h-[400px] flex flex-col">
+         <AnimatePresence mode="wait">
+           {failed ? (
+             <motion.div key="fail" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex-1 flex flex-col items-center justify-center text-center space-y-8">
+                <ZapOff size={64} className="text-red-600 animate-pulse" />
+                <h3 className="font-embroidery text-5xl text-white italic">KNOWLEDGE GAP <br/> DETECTED</h3>
+                <button onClick={reset} className="px-12 py-5 bg-white text-black font-black rounded-2xl text-[10px] uppercase tracking-widest hover:bg-red-600 hover:text-white transition-all">Re-Calibrate</button>
+             </motion.div>
+           ) : complete ? (
+             <motion.div key="win" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex-1 flex flex-col items-center justify-center text-center space-y-8">
+                <div className="w-24 h-24 bg-green-500 rounded-[2rem] flex items-center justify-center shadow-2xl animate-bounce">
+                   <ShieldCheck size={48} className="text-white" />
                 </div>
-                <h2 className="font-embroidery text-6xl md:text-8xl italic leading-tight">THE MENU <br/><span className="font-embroidery-sketch text-red-600">SYSTEM</span></h2>
-             </div>
-             <p className="max-w-xl text-lg font-medium text-gray-500 leading-relaxed uppercase">
-                Every camera brand (Canon, Nikon, Sony, Fujifilm) has a different "language," but they all share a core menu structure. You must learn to find three things instantly.
-             </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-             <MenuNode 
-                icon={<HardDrive/>}
-                title="FORMAT CARD"
-                desc="The most important button before any session. It deletes everything and resets the file structure. Use with extreme caution."
-             />
-             <MenuNode 
-                icon={<ImageIcon/>}
-                title="IMAGE QUALITY"
-                desc="Always ensure you are set to RAW for the highest fidelity. JPEGs are for social media; RAW files are for the Pichazangu Archive."
-             />
-             <MenuNode 
-                icon={<Crosshair/>}
-                title="FOCUS MODE"
-                desc="Switching between 'Single' for portraits and 'Continuous' (AF-C/Servo) for action or sports. Know this toggle by touch."
-             />
-          </div>
-       </div>
-       <div className="absolute top-0 right-0 p-20 opacity-[0.03] select-none pointer-events-none text-[35rem] font-embroidery whitespace-nowrap rotate-12">
-          MENU
-       </div>
+                <h3 className="font-embroidery text-5xl text-white italic">SYNCHRONIZATION <br/> COMPLETE</h3>
+                <button onClick={onComplete} className="w-full py-6 bg-red-600 text-white font-black rounded-2xl text-xs uppercase tracking-widest shadow-xl">PROCEED TO NEXT NODE</button>
+             </motion.div>
+           ) : (
+             <motion.div key="q" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="flex-1 space-y-10">
+                <div className="flex justify-between items-center text-[10px] font-black uppercase text-gray-500">
+                   <span>Question {currentIdx + 1} of {quiz.questions.length}</span>
+                </div>
+                <h3 className="text-3xl font-black uppercase text-white leading-tight tracking-tighter">
+                   {quiz.questions[currentIdx].q}
+                </h3>
+                <div className="grid grid-cols-1 gap-4">
+                   {quiz.questions[currentIdx].options.map((opt: string, i: number) => (
+                     <button 
+                       key={i} 
+                       onClick={() => handleAnswer(i)}
+                       className="p-6 bg-white/5 border border-white/10 rounded-[1.8rem] text-left hover:bg-white hover:text-black transition-all font-bold text-sm uppercase tracking-tight"
+                     >
+                       {opt}
+                     </button>
+                   ))}
+                </div>
+             </motion.div>
+           )}
+         </AnimatePresence>
+      </div>
     </div>
+  );
+};
 
-    {/* SECTION 3: THE WORKFLOW CHECKLIST */}
-    <div className="space-y-16">
-       <div className="text-center space-y-6">
-          <h3 className="font-embroidery text-6xl italic text-white uppercase">THE <span className="text-red-600 font-embroidery-sketch">WORKFLOW</span> CHECKLIST</h3>
-          <p className="text-gray-500 font-black text-xs uppercase tracking-[0.6em]">Zero-Error Protocol for Regional Assignments</p>
-       </div>
+const PracticalNode = ({ lesson, onComplete }: any) => {
+  const [uploading, setUploading] = useState(false);
+  const [feedback, setFeedback] = useState<string | null>(null);
+  const [success, setSuccess] = useState(false);
 
-       <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
-          <div className="bg-[#0a0a0a] border border-white/5 rounded-[4rem] p-12 space-y-10">
+  const handleUpload = async () => {
+    setUploading(true);
+    setFeedback(null);
+    
+    // Simulate Gemini Vision Analysis
+    try {
+      const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+      // In a real app, we'd send the actual image bytes here.
+      // We simulate the response for the demo UX.
+      setTimeout(() => {
+        setUploading(false);
+        setFeedback("AI ANALYSIS: Composition follows the Golden Ratio. Lighting shows good dynamic range in highlights. Color correction node matches regional 'Nairobi Afternoon' profile.");
+        setSuccess(true);
+      }, 3500);
+    } catch (e) {
+      setUploading(false);
+      setSuccess(true);
+    }
+  };
+
+  return (
+    <div className="space-y-12">
+      <div className="bg-[#0a0a0a] border border-white/5 rounded-[3.5rem] p-16 flex flex-col items-center justify-center text-center space-y-8 relative overflow-hidden group">
+         <div className="relative z-10">
+           {success ? (
+             <motion.div initial={{ scale: 0.8 }} animate={{ scale: 1 }} className="space-y-8">
+                <div className="w-20 h-20 bg-green-500 rounded-full flex items-center justify-center mx-auto shadow-2xl">
+                   <CheckCircle size={40} className="text-white" />
+                </div>
+                <div className="bg-white/5 border border-white/10 p-8 rounded-3xl text-left max-w-md mx-auto">
+                   <div className="flex items-center gap-2 mb-4 text-red-600">
+                      <BrainCircuit size={18} />
+                      <span className="text-[10px] font-black uppercase tracking-widest">Neural Feedback Node</span>
+                   </div>
+                   <p className="text-sm font-medium leading-relaxed text-gray-300 italic">"{feedback}"</p>
+                </div>
+                <button onClick={onComplete} className="px-12 py-5 bg-red-600 text-white font-black rounded-2xl text-[10px] uppercase tracking-widest shadow-xl">SYNCHRONIZE MASTERY</button>
+             </motion.div>
+           ) : uploading ? (
+             <div className="space-y-6">
+                <Loader2 size={64} className="animate-spin text-red-600 mx-auto" />
+                <h3 className="font-embroidery text-4xl italic text-white uppercase tracking-tighter">ANALYZING PIXELS...</h3>
+                <p className="text-gray-500 text-[10px] font-black uppercase tracking-widest animate-pulse">Running Neural Composition Check</p>
+             </div>
+           ) : (
              <div className="space-y-8">
-                <ChecklistItem num="01" title="Power & Storage" desc="Check your battery and card. Nothing is worse than arriving at a wedding with a dead battery." />
-                <ChecklistItem num="02" title="Light Temperature" desc="Set your White Balance. Match the camera to the light (Sun, Shade, or Fluorescent)." />
-                <ChecklistItem num="03" title="Calibration" desc="Check your Exposure. Look at the meter in your viewfinder. Is it sitting at '0'?" />
-                <ChecklistItem num="04" title="Composition" desc="Focus, Recompose, Shoot. Focus on the eyes, move for a better crop, then squeeze." />
-             </div>
-          </div>
-          <div className="relative rounded-[4rem] overflow-hidden border border-white/5 shadow-2xl">
-             <img src="https://images.unsplash.com/photo-1511795409834-ef04bbd61622?auto=format&fit=crop&w=1200&q=80" className="w-full h-full object-cover grayscale opacity-30" alt="Workflow Context" />
-             <div className="absolute inset-0 bg-gradient-to-t from-black to-transparent" />
-             <div className="absolute bottom-10 left-10 right-10">
-                <div className="bg-red-600 p-6 rounded-3xl shadow-2xl">
-                   <h4 className="text-white font-black text-xs uppercase mb-2">Pichazangu Field Protocol</h4>
-                   <p className="text-white/80 text-xs font-bold leading-relaxed uppercase">"A pro is someone who makes the machine invisible so the story can shine. Follow the checklist, then forget the gear."</p>
+                <div className="w-24 h-24 bg-red-600/10 border border-red-600/20 rounded-[2.5rem] flex items-center justify-center mx-auto group-hover:scale-110 transition-transform">
+                   <Upload size={48} className="text-red-600" />
                 </div>
+                <h3 className="font-embroidery text-4xl italic text-white uppercase">SUBMIT PRACTICAL ASSET</h3>
+                <p className="text-gray-500 text-sm font-medium leading-relaxed uppercase max-w-xs mx-auto">
+                   Assignment: {lesson.title}. <br/> Upload your uncompressed RAW/JPEG for AI-powered composition review.
+                </p>
+                <button onClick={handleUpload} className="px-12 py-5 bg-red-600 text-white font-black rounded-[2rem] text-[10px] uppercase tracking-widest shadow-2xl hover:bg-white hover:text-black transition-all">Select Local Archive</button>
              </div>
-          </div>
-       </div>
+           )}
+         </div>
+         <Fingerprint size={250} className="absolute -bottom-20 -right-20 opacity-[0.02] text-red-600" />
+      </div>
     </div>
+  );
+};
 
-    {/* PRO TIP: RED PROTOCOL */}
-    <div className="p-16 bg-red-600 rounded-[4rem] text-white shadow-3xl relative overflow-hidden group">
-       <div className="relative z-10 max-w-4xl">
-          <div className="flex items-center gap-4 mb-8">
-             <Zap size={32} className="fill-current" />
-             <span className="text-xs font-black uppercase tracking-[0.5em]">The Pro Tip (RED)</span>
+const GraduationPortal = ({ course, onExit }: any) => {
+  const [downloading, setDownloading] = useState(false);
+
+  const handleDownload = () => {
+    setDownloading(true);
+    setTimeout(() => {
+      setDownloading(false);
+      useToastStore.getState().showToast("Regional Archive Diploma Saved", "success");
+    }, 3000);
+  };
+
+  return (
+    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="h-full flex flex-col items-center justify-center p-20 text-center space-y-12">
+       <div className="relative">
+          <div className="absolute inset-0 bg-red-600 blur-[100px] opacity-20 animate-pulse" />
+          <div className="w-40 h-40 bg-white rounded-[3rem] flex items-center justify-center shadow-2xl relative z-10">
+             <GraduationCap size={80} className="text-red-600" />
           </div>
-          <h3 className="font-embroidery text-6xl md:text-8xl italic leading-none mb-10">THE <br/><span className="font-embroidery-sketch text-black">HEARTBEAT.</span></h3>
-          <p className="text-xl md:text-2xl font-bold uppercase tracking-tight leading-relaxed mb-12">
-             Treat your shutter button like a heartbeat. A gentle squeeze produces a sharp image; a violent poke produces a blurry one. Sync your press with your exhale for the ultimate stability.
+          <motion.div animate={{ rotate: 360 }} transition={{ duration: 20, repeat: Infinity, ease: 'linear' }} className="absolute -inset-6 border-2 border-dashed border-red-600/30 rounded-full" />
+       </div>
+
+       <div className="space-y-6 relative z-10">
+          <h1 className="font-embroidery text-7xl md:text-[10rem] italic leading-none text-white uppercase">ACADEMY <br/><span className="text-red-600">COMPLETE</span></h1>
+          <p className="text-2xl text-gray-400 font-medium leading-relaxed uppercase tracking-widest max-w-2xl mx-auto">
+            You are now a verified archival node in the East African media network.
           </p>
        </div>
-       <Zap size={400} className="absolute -right-20 -bottom-20 opacity-10 rotate-12 group-hover:rotate-0 transition-transform duration-700" />
-    </div>
 
-    {/* EXPERIMENTAL TIP */}
-    <div className="space-y-12">
-       <div className="bg-white/5 border border-white/10 p-16 rounded-[4rem] relative overflow-hidden group">
-          <div className="relative z-10 max-w-4xl">
-             <div className="flex items-center gap-4 mb-10">
-                <Fingerprint size={32} className="text-red-600 animate-pulse" />
-                <h2 className="font-embroidery text-5xl text-white italic">PRACTICAL: <span className="text-red-600">THE BLIND CHALLENGE</span></h2>
+       {/* DIPLOMA PREVIEW */}
+       <div className="mt-12 w-full max-w-2xl aspect-[1.414/1] bg-white text-black rounded-xl p-16 flex flex-col items-center justify-between border-8 border-red-600 relative group shadow-[0_50px_100px_rgba(0,0,0,0.5)]">
+          <div className="w-full flex justify-between items-start">
+             <div className="bg-red-600 p-4 rounded-2xl text-white"><Camera size={32}/></div>
+             <div className="text-right flex flex-col items-end">
+                <QrCode size={80} className="opacity-80 mb-2" />
+                <span className="text-[8px] font-black uppercase text-gray-400">Scan to Verify Identity Node</span>
              </div>
-             <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
-                <div className="space-y-6">
-                   <p className="text-gray-400 text-lg uppercase font-medium leading-relaxed">
-                      In professional photography, things happen fast. If you have to look down at your buttons, you will miss the shot.
-                   </p>
-                   <div className="space-y-4">
-                      <Step num="01" text="In a dimly lit room, try to change your ISO and Aperture settings without looking." />
-                      <Step num="02" text="Use the dials and feel the 'clicks'. Memorize the geography of your body." />
-                      <Step num="03" text="Try to navigate to 'Format Card' within the menu system with your eyes closed." />
-                   </div>
-                </div>
-                <div className="bg-black p-10 rounded-[3rem] border border-white/5 flex flex-col justify-center text-center">
-                   <Target size={64} className="text-red-600 mx-auto mb-8" />
-                   <h4 className="text-2xl font-black text-white mb-4 uppercase">BUILD MUSCLE MEMORY</h4>
-                   <p className="text-gray-500 text-sm font-bold leading-relaxed uppercase tracking-widest">
-                      "If you can't operate your camera in total darkness, you are not yet a master of the machine. The handshake must be instinctual."
-                   </p>
-                </div>
+          </div>
+          <div className="text-center space-y-4">
+             <span className="text-[10px] font-black uppercase tracking-[0.6em] text-red-600">Official Certification of Mastery</span>
+             <h4 className="font-embroidery text-6xl uppercase italic tracking-tighter">ZANGU CERTIFIED PRO</h4>
+             <p className="font-serif text-xl italic opacity-70">This verifies that the recipient has mastered the technical <br/> and philosophical fundamentals of regional media archiving.</p>
+          </div>
+          <div className="w-full flex justify-between items-end border-t-2 border-gray-200 pt-8">
+             <div className="text-left">
+                <span className="block text-[8px] font-black uppercase text-gray-400">Registry ID</span>
+                <span className="text-[12px] font-bold">PZ-NODE-2025-ALPHA-911</span>
+             </div>
+             <div className="text-right">
+                <span className="block text-[8px] font-black uppercase text-gray-400">Issued Date</span>
+                <span className="text-[12px] font-bold uppercase">{new Date().toLocaleDateString()}</span>
              </div>
           </div>
        </div>
-    </div>
-  </div>
-);
 
-const ModuleFiveContent = () => (
-  <div className="space-y-12 pb-20">
-    <div className="space-y-6 text-center">
-      <h2 className="font-embroidery text-8xl md:text-9xl text-white italic leading-none">FIND YOUR <br/><span className="font-embroidery-sketch text-red-600">FIELD</span></h2>
-      <p className="text-2xl text-gray-400 font-medium leading-relaxed uppercase tracking-tight max-w-4xl mx-auto mt-10">Photography is not a single job; it is a galaxy of specializations. The highest-paid creators on Pichazangu are Specialists.</p>
-    </div>
-  </div>
-);
-
-const ModuleSixContent = () => (
-  <div className="space-y-12 pb-20">
-    <div className="space-y-6">
-      <h2 className="text-4xl font-black uppercase tracking-tighter text-white">I. The Art of the Human Soul</h2>
-      <p className="text-lg leading-relaxed text-gray-400 uppercase">
-        Portraiture is the foundation of the Pichazangu Private Vault system. It is the most consistent way to earn a living in the region.
-      </p>
-    </div>
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-       <div className="bg-[#0a0a0a] border border-white/5 rounded-[3rem] p-10 space-y-6">
-          <h3 className="font-embroidery text-3xl italic text-white uppercase">The Director's Role</h3>
-          <p className="text-gray-400 text-sm leading-relaxed">In the studio, you are the Director. You aren't just taking a picture; you are managing the subject’s emotions.</p>
+       <div className="flex gap-6 relative z-10 pt-10">
+          <button 
+            onClick={handleDownload}
+            disabled={downloading}
+            className="px-16 py-6 bg-red-600 text-white font-black rounded-full shadow-2xl shadow-red-900/50 flex items-center gap-4 hover:bg-white hover:text-red-600 transition-all text-xs uppercase tracking-widest"
+          >
+             {downloading ? <Loader2 className="animate-spin" /> : <Download />}
+             {downloading ? 'SYNCING ARCHIVE...' : 'SAVE TO SYSTEM GALLERY'}
+          </button>
+          <button onClick={onExit} className="px-16 py-6 bg-white/5 border border-white/10 text-white font-black rounded-full hover:bg-white/10 transition-all text-xs uppercase tracking-widest">
+             EXIT ACADEMY HUB
+          </button>
        </div>
-    </div>
-  </div>
-);
-
-// --- COMPONENTS ---
-
-const Step = ({num, text}: any) => (
-  <div className="flex gap-6 p-6 bg-white/5 rounded-2xl border border-white/5 hover:bg-red-600/5 transition-colors group">
-     <span className="font-bungee text-2xl text-red-600 group-hover:scale-110 transition-transform">{num}</span>
-     <p className="text-sm font-bold text-gray-400 group-hover:text-white transition-colors uppercase tracking-tight leading-relaxed">{text}</p>
-  </div>
-);
-
-const CircleIcon = ({size}: any) => (
-  <div className="w-6 h-6 rounded-full border-2 border-current flex items-center justify-center">
-    <div className="w-2 h-2 bg-current rounded-full" />
-  </div>
-);
-
-const LegacyFeature = ({icon, title, desc}: any) => (
-  <div className="flex gap-6 p-6 bg-white/5 rounded-3xl border border-white/5 hover:bg-white/10 transition-all group">
-     <div className="text-red-600 mt-1">{icon}</div>
-     <div>
-        <h4 className="font-black text-white uppercase text-sm mb-2">{title}</h4>
-        <p className="text-[10px] text-gray-500 font-bold uppercase leading-relaxed">{desc}</p>
-     </div>
-  </div>
-);
-
-const ModernFeatureCard = ({icon, title, desc}: any) => (
-  <div className="bg-gray-50 border border-gray-100 p-10 rounded-[3rem] hover:bg-white hover:shadow-2xl transition-all group">
-     <div className="text-red-600 mb-8 group-hover:scale-110 transition-transform duration-500">{React.cloneElement(icon as React.ReactElement, { size: 36 })}</div>
-     <h4 className="font-black text-gray-900 uppercase text-xl mb-4 tracking-tighter">{title}</h4>
-     <p className="text-gray-500 text-xs font-bold leading-relaxed uppercase tracking-tight">{desc}</p>
-  </div>
-);
-
-const GripPoint = ({num, title, desc}: any) => (
-  <div className="flex gap-6 items-start group">
-     <span className="font-bungee text-2xl text-red-600 transition-transform group-hover:scale-110">{num}</span>
-     <div>
-        <h4 className="font-black text-white uppercase text-sm mb-2 tracking-widest">{title}</h4>
-        <p className="text-xs text-gray-500 font-bold uppercase leading-relaxed">{desc}</p>
-     </div>
-  </div>
-);
-
-const MenuNode = ({icon, title, desc}: any) => (
-  <div className="p-8 bg-gray-50 rounded-[2.5rem] border border-gray-100 group hover:bg-white hover:shadow-xl transition-all">
-     <div className="text-red-600 mb-6">{React.cloneElement(icon as React.ReactElement, { size: 28 })}</div>
-     <h4 className="font-black text-gray-900 uppercase text-sm mb-3 tracking-widest">{title}</h4>
-     <p className="text-[10px] text-gray-500 font-bold leading-relaxed uppercase tracking-tight">{desc}</p>
-  </div>
-);
-
-const ChecklistItem = ({num, title, desc}: any) => (
-  <div className="flex gap-6 group">
-     <div className="w-10 h-10 rounded-xl bg-red-600/10 text-red-600 flex items-center justify-center font-bungee text-sm shrink-0">{num}</div>
-     <div>
-        <h4 className="font-black text-white uppercase text-sm mb-1 tracking-widest group-hover:text-red-600 transition-colors">{title}</h4>
-        <p className="text-[10px] text-gray-500 font-bold uppercase leading-relaxed">{desc}</p>
-     </div>
-  </div>
-);
+    </motion.div>
+  );
+};
 
 export default Learn;

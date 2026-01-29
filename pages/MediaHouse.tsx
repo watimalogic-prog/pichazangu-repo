@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 // DO add comment above each fix.
-// Fixed 'Cannot find name Play' and 'Cannot find name Clock' by adding them to the lucide-react import list.
+// Integrated AI-Negotiator for high-stakes exclusive deals.
 import { 
   Zap, Download, Lock, CheckCircle2, Globe, MapPin, 
   ShieldAlert, Radio, Search, Filter, Settings, 
@@ -9,21 +9,26 @@ import {
   Video, Maximize2, RefreshCcw, Smartphone, 
   ChevronRight, Trash2, Layers, Map, Shield,
   X, Loader2, Send, Terminal, AlertTriangle,
-  Play, Clock
+  Play, Clock, Bot
 } from 'lucide-react';
 import { MOCK_PHOTOS, MOCK_NEWS_BOUNTIES, MOCK_NEWS_CLIPS, CURRENCY_SYMBOLS } from '../constants';
 import { Photo } from '../types';
 import VerificationBadge from '../components/VerificationBadge';
-import { useToastStore, useThemeStore } from '../store/useAppStore';
+import { useToastStore, useThemeStore, useUserStore } from '../store/useAppStore';
+import AiNegotiator from '../components/AiNegotiator';
 
 const MediaHouse: React.FC = () => {
   const showToast = useToastStore((state) => state.showToast);
+  const { user } = useUserStore();
   const [activeTab, setActiveTab] = useState<'wire' | 'bounties' | 'b-roll' | 'settings'>('wire');
   const [tickerMsg, setTickerMsg] = useState('PROTESTS IN NAIROBI CBD - 14 PHOTOGRAPHERS ACTIVE');
   const [selectedPhotos, setSelectedPhotos] = useState<string[]>([]);
   const [watermark, setWatermark] = useState<'none' | 'NTV' | 'Citizen' | 'BBC'>('none');
   const [showInvoiceModal, setShowInvoiceModal] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
+  
+  // Negotiation State
+  const [negotiatingPhoto, setNegotiatingPhoto] = useState<Photo | null>(null);
   
   // Search & Filter State
   const [searchQuery, setSearchQuery] = useState('');
@@ -213,6 +218,7 @@ const MediaHouse: React.FC = () => {
                       photo={photo} 
                       isSelected={selectedPhotos.includes(photo.id)}
                       onSelect={() => toggleSelect(photo.id)}
+                      onNegotiate={() => setNegotiatingPhoto(photo)}
                       watermark={watermark}
                     />
                   ))
@@ -507,6 +513,17 @@ const MediaHouse: React.FC = () => {
          </div>
       </aside>
 
+      {/* NEGOTIATION MODAL */}
+      <AnimatePresence>
+        {negotiatingPhoto && user && (
+          <AiNegotiator 
+            photo={negotiatingPhoto} 
+            user={user} 
+            onClose={() => setNegotiatingPhoto(null)} 
+          />
+        )}
+      </AnimatePresence>
+
       {/* MODAL: LICENSING & INVOICE */}
       <AnimatePresence>
          {showInvoiceModal && (
@@ -515,7 +532,7 @@ const MediaHouse: React.FC = () => {
                initial={{ scale: 0.9, opacity: 0 }}
                animate={{ scale: 1, opacity: 1 }}
                exit={{ scale: 0.9, opacity: 0 }}
-               className="bg-white rounded-[4rem] shadow-2xl overflow-hidden max-w-2xl w-full text-black"
+               className="bg-white text-black rounded-[4rem] shadow-2xl overflow-hidden max-w-2xl w-full text-black"
              >
                 <div className="bg-red-600 p-10 text-white flex justify-between items-center">
                    <div className="flex items-center gap-4">
@@ -567,89 +584,6 @@ const MediaHouse: React.FC = () => {
          )}
       </AnimatePresence>
 
-      {/* MODAL: BOUNTY POSTER */}
-      <AnimatePresence>
-         {showBountyModal && (
-           <div className="fixed inset-0 z-[400] flex items-center justify-center p-6 bg-black/90 backdrop-blur-2xl">
-              <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="bg-white text-black rounded-[4rem] shadow-2xl overflow-hidden max-w-xl w-full">
-                 <div className="bg-black p-10 text-white flex justify-between items-center">
-                    <h3 className="font-embroidery text-4xl italic uppercase">INITIALIZE <span className="text-red-600">MISSION</span></h3>
-                    <button onClick={() => setShowBountyModal(false)} className="p-3 bg-white/5 rounded-full hover:bg-red-600"><X size={24}/></button>
-                 </div>
-                 <form onSubmit={handlePostBounty} className="p-12 space-y-6">
-                    <div className="space-y-2">
-                       <label className="text-[10px] font-black uppercase tracking-widest text-gray-400">Mission Title</label>
-                       <input name="title" required placeholder="e.g. Flooding in Mathare Valley" className="w-full p-4 bg-gray-50 border border-gray-100 rounded-2xl outline-none focus:border-red-600 transition-all font-bold" />
-                    </div>
-                    <div className="grid grid-cols-2 gap-4">
-                       <div className="space-y-2">
-                          <label className="text-[10px] font-black uppercase tracking-widest text-gray-400">Target Sector</label>
-                          <input name="location" required placeholder="Location..." className="w-full p-4 bg-gray-50 border border-gray-100 rounded-2xl outline-none focus:border-red-600 transition-all font-bold" />
-                       </div>
-                       <div className="space-y-2">
-                          <label className="text-[10px] font-black uppercase tracking-widest text-gray-400">Bounty Pool (KES)</label>
-                          <input name="reward" required type="number" placeholder="10000" className="w-full p-4 bg-gray-50 border border-gray-100 rounded-2xl outline-none focus:border-red-600 transition-all font-bold" />
-                       </div>
-                    </div>
-                    <div className="space-y-2">
-                       <label className="text-[10px] font-black uppercase tracking-widest text-gray-400">Mission Requirements</label>
-                       <textarea name="description" required rows={4} placeholder="Specific shots required, urgency level, etc." className="w-full p-4 bg-gray-50 border border-gray-100 rounded-2xl outline-none focus:border-red-600 transition-all font-medium" />
-                    </div>
-                    <div className="p-4 bg-red-50 rounded-2xl border border-red-100 flex items-start gap-4">
-                       <AlertTriangle className="text-red-600 mt-1 shrink-0" size={20} />
-                       <p className="text-[9px] font-bold text-red-700 uppercase leading-relaxed tracking-widest">Bounty creation authorizes an escrow hold on your media house account balance.</p>
-                    </div>
-                    <button type="submit" className="w-full bg-red-600 text-white font-black py-5 rounded-[2rem] shadow-xl shadow-red-900/40 hover:bg-black transition-all uppercase text-xs tracking-widest">ACTIVATE MISSION</button>
-                 </form>
-              </motion.div>
-           </div>
-         )}
-      </AnimatePresence>
-
-      {/* MODAL: FTP CONFIG */}
-      <AnimatePresence>
-         {showFtpConfig && (
-           <div className="fixed inset-0 z-[500] flex items-center justify-center p-6 bg-black/95 backdrop-blur-xl">
-              <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="bg-[#0a0a0a] border border-red-600/30 text-white rounded-[3rem] shadow-2xl p-12 max-w-md w-full">
-                 <div className="flex items-center gap-4 mb-10">
-                    <Terminal className="text-red-600" size={32} />
-                    <h3 className="text-2xl font-black uppercase tracking-tighter">FTP GATEWAY v4.1</h3>
-                 </div>
-                 <div className="space-y-6">
-                    <div className="space-y-2">
-                       <label className="text-[10px] font-black uppercase text-gray-500 tracking-widest">Remote Server Host</label>
-                       <input type="text" defaultValue="ftp.nationmedia.com" className="w-full bg-black border border-white/10 p-4 rounded-xl text-xs font-bold outline-none focus:border-red-600" />
-                    </div>
-                    <div className="space-y-2">
-                       <label className="text-[10px] font-black uppercase text-gray-500 tracking-widest">Protocol Type</label>
-                       <select className="w-full bg-black border border-white/10 p-4 rounded-xl text-xs font-bold outline-none focus:border-red-600 appearance-none">
-                          <option>SFTP (Secure Port 22)</option>
-                          <option>FTPS (Implicit SSL)</option>
-                       </select>
-                    </div>
-                    <div className="grid grid-cols-2 gap-4">
-                       <div className="space-y-2">
-                          <label className="text-[10px] font-black uppercase text-gray-500 tracking-widest">Username</label>
-                          <input type="text" defaultValue="editor_alpha" className="w-full bg-black border border-white/10 p-4 rounded-xl text-xs font-bold" />
-                       </div>
-                       <div className="space-y-2">
-                          <label className="text-[10px] font-black uppercase text-gray-500 tracking-widest">Directory</label>
-                          <input type="text" defaultValue="/picha_ingest" className="w-full bg-black border border-white/10 p-4 rounded-xl text-xs font-bold" />
-                       </div>
-                    </div>
-                    <button 
-                      onClick={() => {setShowFtpConfig(false); showToast("Link Configuration Saved", "success");}}
-                      className="w-full bg-red-600 text-white font-black py-5 rounded-2xl text-[10px] uppercase tracking-widest hover:bg-white hover:text-red-600 transition-all shadow-xl shadow-red-900/40 mt-6"
-                    >
-                      Verify Sat-Link Connection
-                    </button>
-                    <button onClick={() => setShowFtpConfig(false)} className="w-full text-[10px] font-black uppercase text-gray-600 hover:text-white transition-colors">Discard</button>
-                 </div>
-              </motion.div>
-           </div>
-         )}
-      </AnimatePresence>
-
     </div>
   );
 };
@@ -658,13 +592,13 @@ interface NewsCardProps {
   photo: Photo;
   isSelected: boolean;
   onSelect: () => void;
+  onNegotiate: () => void;
   watermark: string;
 }
 
-const NewsCard: React.FC<NewsCardProps> = ({ photo, isSelected, onSelect, watermark }) => {
+const NewsCard: React.FC<NewsCardProps> = ({ photo, isSelected, onSelect, onNegotiate, watermark }) => {
   const timeAgo = useMemo(() => Math.floor(Math.random() * 60) + 1, []);
   const isVerified = (photo.authenticityScore || 0) > 90;
-  // Unique coordinates for each card
   const coords = useMemo(() => `LAT: ${photo.lat || '-1.28'}${Math.floor(Math.random()*999)} LONG: ${photo.lng || '36.82'}${Math.floor(Math.random()*999)}`, [photo]);
 
   return (
@@ -729,10 +663,10 @@ const NewsCard: React.FC<NewsCardProps> = ({ photo, isSelected, onSelect, waterm
            
            <div className="flex items-center gap-6">
               <button 
-                onClick={(e) => { e.stopPropagation(); useToastStore.getState().showToast("Processing Exclusive Bid...", "info"); }}
-                className="text-[9px] font-black text-red-600 uppercase tracking-widest hover:text-white transition-colors border-b border-red-600/30"
+                onClick={(e) => { e.stopPropagation(); onNegotiate(); }}
+                className="flex items-center gap-2 text-[9px] font-black text-red-600 uppercase tracking-widest hover:text-white transition-colors border-b border-red-600/30"
               >
-                Buy Exclusive: KSH 50,000
+                <Bot size={12} /> Negotiate Exclusive
               </button>
               <div className={`w-8 h-8 rounded-xl border-2 flex items-center justify-center transition-all ${isSelected ? 'bg-red-600 border-red-600 text-white' : 'border-white/10 group-hover:border-white/30'}`}>
                 {isSelected && <CheckCircle2 size={16} />}
@@ -744,40 +678,47 @@ const NewsCard: React.FC<NewsCardProps> = ({ photo, isSelected, onSelect, waterm
   );
 };
 
-const SidebarBtn = ({icon, label, active, onClick}: {icon: any, label: string, active: boolean, onClick: any}) => (
+// DO add comment above each fix.
+// Fixed missing 'SidebarBtn' component definition.
+const SidebarBtn = ({ icon, label, active, onClick }: { icon: any, label: string, active: boolean, onClick: () => void }) => (
   <button 
     onClick={onClick}
-    className={`w-full flex items-center gap-4 p-4 rounded-xl transition-all font-black text-[10px] uppercase tracking-widest border-2 ${
+    className={`w-full flex items-center gap-4 p-4 rounded-xl transition-all font-black text-[10px] uppercase tracking-widest border ${
       active 
-        ? 'bg-red-600 border-red-600 text-white shadow-xl shadow-red-900/40' 
-        : 'text-gray-500 border-transparent hover:bg-white/5 hover:text-white'
+        ? 'bg-red-600 border-red-600 text-white shadow-lg' 
+        : 'bg-transparent border-transparent text-gray-500 hover:text-white hover:bg-white/5'
     }`}
   >
     {icon} {label}
   </button>
 );
 
-const FilterChip = ({label, active, onClick}: {label: string, active?: boolean, onClick: any}) => (
+// DO add comment above each fix.
+// Fixed missing 'FilterChip' component definition.
+const FilterChip = ({ label, active, onClick }: { label: string, active: boolean, onClick: () => void }) => (
   <button 
     onClick={onClick}
-    className={`px-5 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest border transition-all ${active ? 'bg-white text-black border-white shadow-lg' : 'bg-transparent border-white/10 text-gray-500 hover:border-white/30 hover:text-white'}`}
+    className={`px-4 py-1.5 rounded-lg text-[9px] font-black uppercase border transition-all ${
+      active 
+        ? 'bg-red-600 border-red-600 text-white shadow-lg' 
+        : 'bg-transparent border-white/10 text-gray-500 hover:text-white hover:border-white/20'
+    }`}
   >
     {label}
   </button>
 );
 
-const ToolBtn = ({icon, label, onClick}: {icon: any, label: string, onClick: any}) => (
+// DO add comment above each fix.
+// Fixed missing 'ToolBtn' component definition.
+const ToolBtn = ({ icon, label, onClick }: { icon: any, label: string, onClick: () => void }) => (
   <button 
     onClick={onClick}
-    className="w-full flex items-center justify-between p-4 bg-white/5 rounded-2xl hover:bg-white/10 transition-all group border border-white/5"
+    className="w-full flex items-center gap-3 p-3 bg-white/5 border border-white/5 rounded-xl hover:bg-red-600 hover:border-red-600 transition-all group"
   >
-     <div className="flex items-center gap-3">
-        <div className="text-gray-500 group-hover:text-red-600 transition-colors">
-          {icon}
-        </div>
-        <span className="text-[9px] font-black uppercase tracking-widest text-gray-400 group-hover:text-white transition-colors">{label}</span>
-     </div>
-     <ChevronRight size={14} className="text-gray-700" />
+    <div className="text-gray-500 group-hover:text-white transition-colors">
+      {icon}
+    </div>
+    <span className="text-[9px] font-black uppercase text-gray-400 group-hover:text-white tracking-widest">{label}</span>
   </button>
 );
 
