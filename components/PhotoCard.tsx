@@ -1,13 +1,12 @@
-
 import React, { useState } from 'react';
-import { MapPin, ShoppingCart, Info, Lock, Zap, Flame, Plus, Layers } from 'lucide-react';
+import { MapPin, ShoppingCart, Info, Lock, Zap, Flame, Plus, Layers, Share2 } from 'lucide-react';
 import { Photo, Currency } from '../types';
 import { COLORS } from '../constants';
 import ProtectedImage from './ProtectedImage';
 import VerificationBadge from './VerificationBadge';
 import FramingStudio from './FramingStudio';
 import LocalizedPrice from './LocalizedPrice';
-import { useCartStore } from '../store/useAppStore';
+import { useCartStore, useToastStore } from '../store/useAppStore';
 import { motion, AnimatePresence } from 'framer-motion';
 
 interface PhotoCardProps {
@@ -19,12 +18,37 @@ interface PhotoCardProps {
 
 const PhotoCard: React.FC<PhotoCardProps> = ({ photo, showGeo, currency = 'KES', isPhotographerMode }) => {
   const addItem = useCartStore((state) => state.addItem);
+  const showToast = useToastStore((state) => state.showToast);
   const [isFramingOpen, setIsFramingOpen] = useState(false);
   
   // Logic: Photographer Price + 7/10 fee
   const platformFee = photo.category === 'Stock' ? 10 : 7;
   const totalPrice = photo.price + platformFee;
   const isIppo = photo.isIPPO;
+
+  const handleShare = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    const shareData = {
+      title: `Pichazangu: ${photo.title}`,
+      text: `Check out this amazing photo by ${photo.photographer} on Pichazangu!`,
+      url: window.location.href,
+    };
+
+    try {
+      if (navigator.share) {
+        await navigator.share(shareData);
+        showToast("Sharing interface opened", "success");
+      } else {
+        await navigator.clipboard.writeText(window.location.href);
+        showToast("Link copied to clipboard", "success");
+      }
+    } catch (err) {
+      if ((err as Error).name !== 'AbortError') {
+        console.error("Error sharing:", err);
+        showToast("Could not share asset", "error");
+      }
+    }
+  };
 
   return (
     <>
@@ -49,8 +73,16 @@ const PhotoCard: React.FC<PhotoCardProps> = ({ photo, showGeo, currency = 'KES',
              <button 
                onClick={(e) => { e.stopPropagation(); setIsFramingOpen(true); }}
                className="p-3 bg-white text-gray-900 rounded-xl shadow-lg hover:bg-red-600 hover:text-white transition-all"
+               title="Frame Visualizer"
              >
                 <Layers size={18} />
+             </button>
+             <button 
+               onClick={handleShare}
+               className="p-3 bg-white text-gray-900 rounded-xl shadow-lg hover:bg-red-600 hover:text-white transition-all"
+               title="Share Asset"
+             >
+                <Share2 size={18} />
              </button>
           </div>
 

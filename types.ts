@@ -1,3 +1,4 @@
+
 export type UserRole = 'photographer' | 'client' | 'media';
 export type Currency = 'KES' | 'UGX' | 'TZS' | 'RWF' | 'USD';
 
@@ -25,6 +26,7 @@ export interface UserProfile {
   role: UserRole;
   name: string;
   avatar: string;
+  banner?: string;
   location: string;
   taxId?: string;
   phone?: string;
@@ -36,72 +38,65 @@ export interface UserProfile {
   photographyGear?: string;
 }
 
-export interface MarketState {
-  vix: number;
-  lastUpdate: string;
-  tickerMessages: string[];
-}
-
-export interface PhotoFeedback {
-  id: string;
-  userId: string;
-  userName: string;
-  comment: string;
-  timestamp: string;
-  requestType?: 'Retouch' | 'Color' | 'Crop' | 'General';
-}
-
+// Added missing Photo interface
 export interface Photo {
   id: string;
-  url: string; 
-  blurDataUrl?: string; 
-  highResUrl?: string; 
-  signedUrl?: string; 
-  signedUrlExpiresAt?: number;
+  url: string;
   title: string;
-  description?: string;
   photographer: string;
   price: number;
   category: string;
-  license: 'Commercial' | 'Editorial' | 'Personal';
-  location?: string;
+  license: string;
+  location: string;
   lat?: number;
   lng?: number;
   tags: string[];
-  isPaid?: boolean;
   uploadedAt?: string;
   authenticityScore?: number;
   credibilityScore?: number;
-  jerseyNumber?: string;
-  matchId?: string;
   isRawTalent?: boolean;
   decisiveMomentSeconds?: number;
-  soundscapeUrl?: string;
-  povVlogUrl?: string;
-  gear?: {
-    camera: string;
-    lens: string;
-    settings: string;
-  };
-  isMediaReady?: boolean;
+  gear?: { camera: string; lens: string; settings: string };
   priceChange24h?: number;
   volume24h?: number;
   historicalPrices?: { time: string; value: number }[];
+  matchId?: string;
+  jerseyNumber?: string;
   isIPPO?: boolean;
-  isStarred?: boolean;
-  proofingStatus?: 'Pending' | 'Approved' | 'Rejected';
-  feedback?: PhotoFeedback[];
+  blurDataUrl?: string;
   collectionId?: string;
+  isPaid?: boolean;
   discountedPrice?: number;
 }
 
-export interface VaultCollection {
+// Added missing Gig interface
+export interface Gig {
   id: string;
-  name: string;
+  title: string;
+  budgetMin: number;
+  budgetMax: number;
+  currency: Currency;
   description: string;
-  coverUrl: string;
+  location: string;
+  postedBy: string;
+  deadline: string;
+  category: string;
+  status: 'Open' | 'Booked' | 'Completed';
+  type: 'Public' | 'Private';
+  urgency: 'Normal' | 'Flash';
+  requirements: string[];
 }
 
+// Added missing Article interface
+export interface Article {
+  id: string;
+  title: string;
+  excerpt: string;
+  thumbnail: string;
+  category: string;
+}
+
+// Added missing Vault interface
 export interface Vault {
   id: string;
   clientId: string;
@@ -115,40 +110,83 @@ export interface Vault {
   photoCount: number;
   lastUpdated: string;
   shootingDate: string;
-  location: string;     
+  location: string;
   isPublic: boolean;
-  archiveStatus: 'Active' | 'Archived' | 'Permanent';
+  archiveStatus: 'Permanent' | 'Active' | 'Archived';
+  targetScreen?: string;
+  price?: number;
   eventName?: string;
-  description?: string;
-  price?: number; 
-  status?: 'locked' | 'unlocked' | 'paid' | 'preview';
-  targetScreen?: 'Sports' | 'Fashion' | 'Wildlife' | 'Street';
+  status?: 'locked' | 'unlocked' | 'preview';
 }
 
-export interface Transaction {
-  id: string;
-  type: 'Sale' | 'Withdrawal' | 'Deposit' | 'Purchase';
-  amount: number;
-  vatAmount?: number;
-  netAmount?: number;
-  currency: Currency;
-  date: string;
-  status: 'Completed' | 'Pending' | 'Failed';
-  taxInvoiceId?: string;
-  items?: string[];
-}
-
-export interface PhotographerMarketStats {
+// Added missing Client interface
+export interface Client {
   id: string;
   name: string;
-  handle: string;
-  marketCap: number;
-  lifetimeSales: number;
-  rating: number;
-  avatar: string;
-  trend: 'up' | 'down';
+  phone: string;
+  isReturning: boolean;
+  totalSpent: number;
+  verified: boolean;
 }
 
+// Added missing Transaction interface
+export interface Transaction {
+  id: string;
+  type: string;
+  amount: number;
+  currency: Currency;
+  date: string;
+  status: string;
+}
+
+// Added missing Model interface
+export interface Model {
+  id: string;
+  name: string;
+  height: string;
+  measurements: string;
+  skinTone: string;
+  verified: boolean;
+  rating: number;
+  thumbnail: string;
+  style: string;
+  agency?: string;
+}
+
+// Added missing CastingCall interface
+export interface CastingCall {
+  id: string;
+  title: string;
+  budget: number;
+  deadline: string;
+  location: string;
+  agency: string;
+  description: string;
+}
+
+// Added missing Bounty interface
+export interface Bounty {
+  id: string;
+  title: string;
+  reward: number;
+  location: string;
+  deadline: string;
+  description: string;
+}
+
+// Added missing NewsClip interface
+export interface NewsClip {
+  id: string;
+  thumbnail: string;
+  url: string;
+  title: string;
+  duration: string;
+  photographer: string;
+  location: string;
+  uploadedAt: string;
+}
+
+// Added missing Match interface
 export interface Match {
   id: string;
   league: string;
@@ -160,6 +198,7 @@ export interface Match {
   status: 'Live' | 'Finished' | 'Upcoming';
 }
 
+// Added missing PlayerStats interface
 export interface PlayerStats {
   id: string;
   name: string;
@@ -172,92 +211,7 @@ export interface PlayerStats {
   image: string;
 }
 
-export interface NewsClip {
-  id: string;
-  thumbnail: string;
-  url: string;
-  title: string;
-  duration: string;
-  photographer: string;
-  location: string;
-  uploadedAt: string;
-}
-
-export interface Bounty {
-  id: string;
-  title: string;
-  reward: number;
-  location: string;
-  deadline: string;
-  description: string;
-}
-
-export interface CartItem extends Photo {
-  discountedPrice?: number;
-}
-
-export interface Client {
-  id: string;
-  name: string;
-  phone: string;
-  isReturning: boolean;
-  totalSpent: number;
-  verified?: boolean;
-  taxId?: string; 
-}
-
-export interface Model {
-  id: string;
-  name: string;
-  height: string;
-  measurements: string;
-  skinTone: string;
-  verified: boolean;
-  rating: number;
-  thumbnail: string;
-  agency?: string;
-  style: 'High Fashion' | 'Streetwear' | 'Commercial' | 'Fitness' | 'Lingerie';
-}
-
-export interface CastingCall {
-  id: string;
-  title: string;
-  budget: number;
-  deadline: string;
-  location: string;
-  agency: string;
-  description: string;
-}
-
-export interface Milestone {
-  id: string;
-  label: string;
-  amount?: number;
-  status: 'Locked' | 'Active' | 'Completed';
-  description: string;
-}
-
-export interface Gig {
-  id: string;
-  title: string;
-  budgetMin: number;
-  budgetMax: number;
-  currency: Currency;
-  description: string;
-  location: string;
-  postedBy: string;
-  deadline: string;
-  category: 'Wedding' | 'News' | 'Sports' | 'Fashion' | 'Corporate';
-  status: 'Open' | 'Booked' | 'In Progress' | 'Completed' | 'Disputed';
-  type: 'Public' | 'Invite';
-  urgency: 'Normal' | 'Flash';
-  requirements: string[];
-  milestones?: Milestone[];
-  hiredPhotographerId?: string;
-  lat?: number;
-  lng?: number;
-}
-
+// Added missing Bid interface
 export interface Bid {
   id: string;
   gigId: string;
@@ -270,65 +224,50 @@ export interface Bid {
   portfolioUrl: string;
 }
 
-export interface Lesson {
-  id: string;
-  title: string;
-  duration?: string;
-  videoUrl?: string;
-  type: 'video' | 'quiz' | 'practical' | 'reading';
-  isCompleted: boolean;
-  milestoneId?: string;
-  proTip?: string;
-}
-
-export interface CourseModule {
-  id: string;
-  title: string;
-  lessons: Lesson[];
-  month?: number;
-}
-
+// Added missing AcademyCourse interface
 export interface AcademyCourse {
   id: string;
-  tier: 1 | 2 | 3;
+  tier: number;
   title: string;
   description: string;
   durationMonths: number;
-  modules: CourseModule[];
-  milestones: Milestone[];
   progress: number;
   isUnlocked: boolean;
+  milestones: Milestone[];
+  modules: Module[];
 }
 
-export interface Grade {
-  id: string;
-  assignmentName: string;
-  score: number;
-  feedback: string;
-  gradedBy: string;
-  date: string;
-}
-
-export interface Message {
-  id: string;
-  from: string;
-  to: string;
-  text: string;
-  timestamp: string;
-  isRead: boolean;
-}
-
-export interface Article {
+export interface Module {
   id: string;
   title: string;
-  excerpt: string;
-  thumbnail: string;
-  category: string;
+  lessons: Lesson[];
 }
 
-export enum PaymentProvider {
-  MPESA = 'M-Pesa',
-  MTN = 'MTN Mobile Money',
-  AIRTEL = 'Airtel Money',
-  VODAFONE = 'Vodafone M-Pesa'
+export interface Lesson {
+  id: string;
+  title: string;
+  type: 'reading' | 'video' | 'quiz' | 'practical';
+  isCompleted: boolean;
+  videoUrl?: string;
+  proTip?: string;
+}
+
+export interface Milestone {
+  id: string;
+  title: string;
+  isCompleted: boolean;
+}
+
+export type Grade = 'A' | 'B' | 'C' | 'D';
+
+// Added missing PhotographerMarketStats interface
+export interface PhotographerMarketStats {
+  id: string;
+  name: string;
+  handle: string;
+  marketCap: number;
+  lifetimeSales: number;
+  rating: number;
+  trend: 'up' | 'down';
+  avatar: string;
 }
